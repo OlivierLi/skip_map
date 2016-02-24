@@ -2,6 +2,8 @@
 #define skip_map_h
 
 #include <limits>
+#include <array>
+#include <exception>
 
 template<class T>
 class skip_map_iterator{
@@ -102,15 +104,130 @@ public:
   bool empty() const noexcept{
     return begin() == end();
   }
-  
   bool size() const noexcept{
     return std::distance(begin(),end());
   }
-  
   size_type max_size() const{
     return std::numeric_limits<size_type>::max();
   }
-  
+
+  void clear() noexcept{
+    throw std::runtime_error("Unimplemented!");
+  }
+  std::pair<iterator,bool> insert( const value_type& value ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class P >
+  std::pair<iterator,bool> insert( P&& value ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  iterator insert( const_iterator hint, const value_type& value ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  iterator insert( const_iterator hint, value_type&& value ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class InputIt >
+  void insert( InputIt first, InputIt last ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  void insert( std::initializer_list<value_type> ilist ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class... Args >
+  std::pair<iterator,bool> emplace( Args&&... args ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template <class... Args>
+  iterator emplace_hint( const_iterator hint, Args&&... args ){
+    throw std::runtime_error("Unimplemented!");
+  }
+
+  iterator erase( const_iterator pos ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  void erase( iterator first, iterator last ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  size_type erase( const key_type& key ){
+    throw std::runtime_error("Unimplemented!");
+  }
+
+  void swap( skip_map& other ){
+    throw std::runtime_error("Unimplemented!");
+  }
+
+  size_type count( const Key& key ) const{
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  size_type count( const K& x ) const{
+    throw std::runtime_error("Unimplemented!");
+
+  }
+  iterator find( const Key& key ){
+    throw std::runtime_error("Unimplemented!");
+
+  }
+  const_iterator find( const Key& key ) const{
+    throw std::runtime_error("Unimplemented!");
+
+  }
+  template< class K > iterator find( const K& x ){
+    throw std::runtime_error("Unimplemented!");
+
+  }
+  template< class K > const_iterator find( const K& x ) const{
+    throw std::runtime_error("Unimplemented!");
+
+  }
+
+  std::pair<iterator,iterator> equal_range( const Key& key ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  std::pair<const_iterator,const_iterator> equal_range( const Key& key ) const{
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  std::pair<iterator,iterator> equal_range( const K& x ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  std::pair<const_iterator,const_iterator> equal_range( const K& x ) const{
+    throw std::runtime_error("Unimplemented!");
+
+  }
+
+  iterator lower_bound( const Key& key ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  const_iterator lower_bound( const Key& key ) const{
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  iterator lower_bound(const K& x){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  const_iterator lower_bound(const K& x) const{
+    throw std::runtime_error("Unimplemented!");
+  }
+
+  iterator upper_bound( const Key& key ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  const_iterator upper_bound( const Key& key ) const{
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  iterator upper_bound( const K& x ){
+    throw std::runtime_error("Unimplemented!");
+  }
+  template< class K >
+  const_iterator upper_bound( const K& x ) const{
+    throw std::runtime_error("Unimplemented!");
+  }
+
 private:
   Allocator allocator;
 };
