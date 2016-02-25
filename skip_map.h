@@ -4,24 +4,42 @@
 #include <limits>
 #include <array>
 #include <exception>
+#include <functional>
 
-template<class T>
-class skip_map_iterator{
-  T& operator*(){
-    throw std::runtime_error("Unimplemented!");
-  }
-  T& operator++(){
-    throw std::runtime_error("Unimplemented!");
-  }
-  T& operator--(){
-    throw std::runtime_error("Unimplemented!");
-  }
+const size_t skip_list_size_k = 5;
+
+template<class Key, class T>
+class skip_map_node{
+  std::array<skip_map_node*, skip_list_size_k> links;
+  skip_map_node* previous;
+  T value;
 };
 
-template<class T,size_t size>
-class skip_map_node{
-  std::array<skip_map_node,size> links;
-  T value;
+template<class Key, class T>
+class skip_map_iterator{
+public:
+  
+  skip_map_iterator(skip_map_node<Key, T>* node):node_(node)
+  {
+  }
+  T& operator*(){
+    return node_->value;
+  }
+  T& operator++(){
+    T& temp = this->operator*();
+    node_=node_->links[0];
+    return temp;
+  }
+  T& operator--(){
+    T& temp = this->operator*();
+    node_=node_->previous;
+    return temp;
+  }
+  bool operator==(const skip_map_iterator<Key, T>& rhs){
+    return node_==rhs->node_;
+  }
+private:
+  skip_map_node<Key, T>* node_;
 };
 
 template<class Key, class T, class Compare = std::less<Key>, class Allocator = std::allocator<std::pair<const Key, T>>>
@@ -33,15 +51,26 @@ public:
   using size_type =	std::size_t;
   using difference_type = std::ptrdiff_t;
   using key_compare	= Compare;
+  using value_compare = std::function<bool(const value_type&,const value_type&)>;
   using allocator_type = Allocator;
   using reference =	value_type&;
   using const_reference	= const value_type&;
   using pointer = typename std::allocator_traits<Allocator>::pointer;
   using const_pointer = typename std::allocator_traits<Allocator>::const_pointer;
-  using iterator = skip_map_iterator<T>;
-  using const_iterator  = const skip_map_iterator<T>;
+  using iterator = skip_map_iterator<Key, T>;
+  using const_iterator  = const iterator;
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const iterator>;
+
+  skip_map():head_(nullptr){
+    //Define a comparator object the compares value_types using the key_comparator
+    Compare key_comparator;
+    value_comparator = [key_comparator](const value_type& lhs,const value_type& rhs)
+      {return key_comparator(lhs.first,rhs.first);};
+  }
+  ~skip_map(){
+    throw std::runtime_error("Unimplemented!");
+  }
   
   Allocator get_allocator() const{
     return allocator;
@@ -227,9 +256,18 @@ public:
   const_iterator upper_bound( const K& x ) const{
     throw std::runtime_error("Unimplemented!");
   }
-
+  
+  value_compare value_comp() const{
+    return value_comparator;
+  }
+  key_compare key_comp() const{
+    return Compare();
+  }
+  
 private:
   Allocator allocator;
+  skip_map_node<Key, T>* head_;
+  value_compare value_comparator;
 };
 
 #endif /* skip_map_h */
