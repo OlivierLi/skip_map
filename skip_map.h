@@ -121,32 +121,38 @@ class skip_map {
     // Create new node
     skip_map_node* new_node = new skip_map_node();
     new_node->entry = value;
-   
-    skip_map_node* temp = head_;
-    //If the list is already we insert directly
+
+    //When the list is empty
     if (!head_) {
       head_ = new_node;
+      return std::make_pair(skip_map_iterator(new_node), true);
     }
-    else {
-      // Find where to insert it
-      // Insert either when we reached the end, or the values get bigger
-      while (temp->links[0] && !key_comparator(new_node->entry.first, temp->links[0]->entry.first)) {
-        //The value is already in the map, don't insert it
-        if (temp->entry.first == value.first) {
-          return std::make_pair(skip_map_iterator(temp), true);
+
+    skip_map_node* temp = head_;
+    skip_map_node* previous = nullptr;
+    while (temp) {
+      if (key_comparator(value.first, temp->entry.first)) {
+        if (!temp->previous) {
+          new_node->links[0] = head_;
+          head_ = new_node;
+          if (temp->links[0]) {
+            temp->links[0]->previous = temp;
+          }
         }
-        temp = temp->links[0];
+        else {
+          new_node->links[0] = temp;
+          temp->previous->links[0] = new_node;
+        }
+        return std::make_pair(skip_map_iterator(temp), true);
       }
-      if (!temp->links[0]) {
-        temp->links[0] = new_node;
-      } else {
-        new_node->links[0] = temp->links[0];
-        temp->links[0] = new_node;
-      }
+      previous = temp;
+      temp = temp->links[0];
     }
+    previous->links[0] = new_node;
+
     return std::make_pair(skip_map_iterator(temp), true);
   }
-  
+
   //------------------------------------------------------------------------------------------------------------------------
   template <class P>
   std::pair<iterator, bool> insert(P&& value) {
