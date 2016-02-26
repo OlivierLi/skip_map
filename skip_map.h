@@ -11,40 +11,42 @@ const size_t skip_list_size_k = 5;
 template <class Key, class T, class Compare = std::less<Key>,
           class Allocator = std::allocator<std::pair<const Key, T>>>
 class skip_map {
+ public:
+  using key_type = Key;
+  using mapped_type = T;
+  // TODO : Keys SHOULD BE CONST, implement proxy object
+  using value_type = std::pair<Key, T>;
+
  private:
   class skip_map_node {
+   public:
     std::array<skip_map_node*, skip_list_size_k> links;
     skip_map_node* previous;
-    Key key;
-    T value;
+    value_type entry;
   };
 
  public:
   class skip_map_iterator {
    public:
     skip_map_iterator(skip_map_node* node) : node_(node) {}
-    T& operator*() { return node_->value; }
-    T& operator++() {
-      T& temp = operator*();
+    value_type& operator*() { return node_->entry; }
+    value_type& operator++() {
+      value_type& temp = operator*();
       node_ = node_->links[0];
       return temp;
     }
-    T& operator--() {
-      T& temp = operator*();
+    value_type& operator--() {
+      value_type& temp = operator*();
       node_ = node_->previous;
       return temp;
     }
-    bool operator==(const skip_map_iterator& rhs) {
-      return node_ == rhs->node_;
-    }
+    bool operator==(const skip_map_iterator& rhs) { return node_ == rhs.node_; }
+    bool operator!=(const skip_map_iterator& rhs) { return node_ != rhs.node_; }
 
    private:
     skip_map_node* node_;
   };
 
-  using key_type = Key;
-  using mapped_type = T;
-  using value_type = std::pair<const Key, T>;
   using size_type = std::size_t;
   using difference_type = std::ptrdiff_t;
   using key_compare = Compare;
@@ -59,8 +61,7 @@ class skip_map {
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const iterator>;
 
-  skip_map() : head_(nullptr) {
-  }
+  skip_map() : head_(nullptr) {}
   ~skip_map() { throw std::runtime_error("Unimplemented!"); }
 
   Allocator get_allocator() const { return allocator; }
@@ -73,7 +74,7 @@ class skip_map {
   T& operator[](const Key& key) { throw std::runtime_error("Unimplemented!"); }
   T& operator[](Key&& key) { throw std::runtime_error("Unimplemented!"); }
 
-  iterator begin() noexcept { throw std::runtime_error("Unimplemented!"); }
+  iterator begin() noexcept { return skip_map_iterator(head_); }
   const_iterator begin() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
@@ -81,7 +82,7 @@ class skip_map {
     throw std::runtime_error("Unimplemented!");
   }
 
-  iterator end() noexcept { throw std::runtime_error("Unimplemented!"); }
+  iterator end() noexcept { return skip_map_iterator(nullptr); }
   const_iterator end() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
@@ -114,9 +115,39 @@ class skip_map {
   size_type max_size() const { return std::numeric_limits<size_type>::max(); }
 
   void clear() noexcept { throw std::runtime_error("Unimplemented!"); }
+
+  //------------------------------------------------------------------------------------------------------------------------
   std::pair<iterator, bool> insert(const value_type& value) {
-    throw std::runtime_error("Unimplemented!");
+    // Create new node
+    skip_map_node* new_node = new skip_map_node();
+    new_node->entry = value;
+   
+    skip_map_node* temp = head_;
+    //If the list is already we insert directly
+    if (!head_) {
+      head_ = new_node;
+    }
+    else {
+      // Find where to insert it
+      // Insert either when we reached the end, or the values get bigger
+      while (temp->links[0] && !key_comparator(new_node->entry.first, temp->links[0]->entry.first)) {
+        //The value is already in the map, don't insert it
+        if (temp->entry.first == value.first) {
+          return std::make_pair(skip_map_iterator(temp), true);
+        }
+        temp = temp->links[0];
+      }
+      if (!temp->links[0]) {
+        temp->links[0] = new_node;
+      } else {
+        new_node->links[0] = temp->links[0];
+        temp->links[0] = new_node;
+      }
+    }
+    return std::make_pair(skip_map_iterator(temp), true);
   }
+  
+  //------------------------------------------------------------------------------------------------------------------------
   template <class P>
   std::pair<iterator, bool> insert(P&& value) {
     throw std::runtime_error("Unimplemented!");
@@ -223,6 +254,7 @@ class skip_map {
  private:
   Allocator allocator;
   skip_map_node* head_;
+  key_compare key_comparator;
 };
 
 template <class Key, class T, class Compare, class Alloc>
