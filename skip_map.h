@@ -32,7 +32,7 @@ public:
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const iterator>;
 
-  skip_map() : head_(nullptr) {}
+  skip_map() : head_(nullptr), end_(new skip_map_node<Key, T>) {}
   ~skip_map() { throw std::runtime_error("Unimplemented!"); }
 
   Allocator get_allocator() const { return allocator; }
@@ -54,8 +54,7 @@ public:
   }
 
   iterator end() noexcept {
-   
-    return iterator(nullptr);
+    return iterator(end_);
   }
   
   const_iterator end() const noexcept {
@@ -99,13 +98,15 @@ public:
     // When the list is empty
     if (!head_) {
       head_ = new_node;
+      head_->links[0] = end_;
+      end_->previous = head_;
       return std::make_pair(iterator(new_node), true);
     }
 
     skip_map_node<Key, T>* temp = head_;
     skip_map_node<Key, T>* previous = nullptr;
 
-    while (temp) {
+    while (temp != end_) {
       
       if(temp->entry == value){
         return std::make_pair(iterator(temp), false);
@@ -137,6 +138,8 @@ public:
     // At this point we reached the end of the list so we simply append.
     new_node->previous = previous;
     previous->links[0] = new_node;
+    new_node->links[0] = end_;
+    end_->previous = new_node;
 
     return std::make_pair(iterator(temp), true);
   }
@@ -247,6 +250,7 @@ public:
  private:
   Allocator allocator;
   skip_map_node<Key, T>* head_;
+  skip_map_node<Key, T>* end_;
   key_compare key_comparator;
 };
 
