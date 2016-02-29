@@ -72,7 +72,7 @@ public:
     return &node->entry;
   }
 
-private:
+//private:
   skip_map_node<Key, T>* node;
 };
 

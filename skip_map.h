@@ -53,7 +53,11 @@ public:
     throw std::runtime_error("Unimplemented!");
   }
 
-  iterator end() noexcept { return iterator(nullptr); }
+  iterator end() noexcept {
+   
+    return iterator(nullptr);
+  }
+  
   const_iterator end() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
@@ -102,6 +106,11 @@ public:
     skip_map_node<Key, T>* previous = nullptr;
 
     while (temp) {
+      
+      if(temp->entry == value){
+        return std::make_pair(iterator(temp), false);
+      }
+      
       if (key_comparator(value.first, temp->entry.first)) {
         // No previous node, we are at the head
         if (!temp->previous) {
