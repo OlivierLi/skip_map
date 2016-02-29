@@ -32,7 +32,7 @@ public:
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const iterator>;
 
-  skip_map() : head_(nullptr), end_(new skip_map_node<Key, T>) {}
+  skip_map() : end_(new skip_map_node<Key, T>),head_(end_) {}
   ~skip_map() { throw std::runtime_error("Unimplemented!"); }
 
   Allocator get_allocator() const { return allocator; }
@@ -45,7 +45,9 @@ public:
   T& operator[](const Key& key) { throw std::runtime_error("Unimplemented!"); }
   T& operator[](Key&& key) { throw std::runtime_error("Unimplemented!"); }
 
-  iterator begin() noexcept { return iterator(head_); }
+  iterator begin() noexcept {
+    return iterator(head_);
+  }
   const_iterator begin() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
@@ -96,7 +98,7 @@ public:
     new_node->entry = value;
 
     // When the list is empty
-    if (!head_) {
+    if (head_==end_) {
       head_ = new_node;
       head_->links[0] = end_;
       end_->previous = head_;
@@ -249,8 +251,8 @@ public:
 
  private:
   Allocator allocator;
-  skip_map_node<Key, T>* head_;
   skip_map_node<Key, T>* end_;
+  skip_map_node<Key, T>* head_;
   key_compare key_comparator;
 };
 
