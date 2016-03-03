@@ -33,7 +33,7 @@ public:
   using const_reverse_iterator = std::reverse_iterator<const iterator>;
 
   skip_map() : end_(new skip_map_node<Key, T>),head_(end_) {}
-  ~skip_map() { throw std::runtime_error("Unimplemented!"); }
+  ~skip_map() = default;
 
   Allocator get_allocator() const { return allocator; }
 
@@ -146,10 +146,12 @@ public:
     return std::make_pair(iterator(temp), true);
   }
 
-  template <class P>
+  /*template <class P>
   std::pair<iterator, bool> insert(P&& value) {
     throw std::runtime_error("Unimplemented!");
   }
+  */
+  
   iterator insert(const_iterator hint, const value_type& value) {
     throw std::runtime_error("Unimplemented!");
   }
