@@ -67,7 +67,7 @@ public:
   }
 
   reverse_iterator rbegin() noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return std::reverse_iterator<skip_map_iterator<Key, T>>(end());
   }
   const_reverse_iterator rbegin() const noexcept {
     throw std::runtime_error("Unimplemented!");
@@ -77,7 +77,7 @@ public:
   }
 
   reverse_iterator rend() noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return std::reverse_iterator<skip_map_iterator<Key, T>>(begin());
   }
   const_reverse_iterator rend() const noexcept {
     throw std::runtime_error("Unimplemented!");
@@ -100,7 +100,7 @@ public:
     // When the list is empty
     if (head_==end_) {
       head_ = new_node;
-      head_->links[0] = end_;
+      head_->set_link(0,end_);
       end_->previous = head_;
       return std::make_pair(iterator(new_node), true);
     }
@@ -117,30 +117,30 @@ public:
       if (key_comparator(value.first, temp->entry.first)) {
         // No previous node, we are at the head
         if (!temp->previous) {
-          new_node->links[0] = head_;
+          new_node->set_link(0,head_);
           head_->previous = new_node;
           head_ = new_node;
         }
         // Simple case where we are inserting in the midle of the list
         else {
-          temp->previous->links[0] = new_node;
+          temp->previous->set_link(0, new_node);
           new_node->previous = temp->previous;
 
           temp->previous = new_node;
-          new_node->links[0] = temp;
+          new_node->set_link(0, temp);
         }
         return std::make_pair(iterator(temp), true);
       }
 
       // Continue traversing
       previous = temp;
-      temp = temp->links[0];
+      temp = temp->link_at(0);
     }
 
     // At this point we reached the end of the list so we simply append.
     new_node->previous = previous;
-    previous->links[0] = new_node;
-    new_node->links[0] = end_;
+    previous->set_link(0, new_node);
+    new_node->set_link(0, end_);
     end_->previous = new_node;
 
     return std::make_pair(iterator(temp), true);

@@ -11,7 +11,7 @@ public:
   skip_map_iterator(const skip_map_iterator& other) : node(other.node) {}
 
   skip_map_iterator& operator++() {
-    node = node->links[0];
+    node = node->link_at(0);
     return *this;
   }
   skip_map_iterator operator++(int){

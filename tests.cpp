@@ -35,10 +35,19 @@ TEST(insert, mixed_order){
   auto map_it = sm.begin();
   for(size_t i=0;i<map.size();++i){
     ASSERT_EQ(sm_it->first, map_it->first);
+    ASSERT_EQ(sm_it->second, map_it->second);
     ++sm_it;
     ++map_it;
   }
   
+  auto sm_rit = sm.rbegin();
+  auto map_rit = map.rbegin();
+  for(size_t i=0;i<map.size();++i){
+    ASSERT_EQ(sm_rit->first, map_rit->first);
+    ASSERT_EQ(sm_rit->second, map_rit->second);
+    ++sm_rit;
+    ++map_rit;
+  }
 }
 
 int main(int argc, char **argv) {
