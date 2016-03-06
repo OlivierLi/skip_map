@@ -20,14 +20,21 @@ public:
   /**
    * The default constructor, only initilializes member variables
    */
-  skip_map_node():links{nullptr}, previous{nullptr}, entry{0,""}{
+  skip_map_node():
+    links{nullptr},
+    previous{nullptr},
+    entry{0,""}
+  {
   }
   
   /**
-   * Constructor, invokes the default constructor and set the the entry member
-   * using the provided values.
+   * Constructor, sets the the entry member using the provided values.
    */
-  skip_map_node(Key key, T value):entry{key,value}{
+  skip_map_node(Key key, T value):
+    links{nullptr},
+    previous{nullptr},
+    entry{key,value}
+  {
   }
  
   /**
