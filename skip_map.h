@@ -17,10 +17,7 @@ class skip_map {
  public:
   using key_type = Key;
   using mapped_type = T;
-  // TODO : Keys SHOULD BE CONST, implement proxy object
-  using value_type = std::pair<Key, T>;
-  
-public:
+  using value_type = std::pair<const Key, T>;
   using size_type = std::size_t;
   using difference_type = std::ptrdiff_t;
   using key_compare = Compare;
@@ -182,7 +179,6 @@ public:
   std::pair<iterator, bool> insert(const value_type& value) {
     // Create new node
     auto new_node = new skip_map_node<Key, T>(value.first,value.second);
-    new_node->entry = value;
 
     // When the list is empty
     if (head_==end_) {

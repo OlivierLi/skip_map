@@ -2,10 +2,10 @@
 #define skip_map_iterator_h
 
 template<class Key, class T, bool is_const>
-class skip_map_iterator : public std::iterator<std::bidirectional_iterator_tag,std::pair<Key, T>>{
+class skip_map_iterator : public std::iterator<std::bidirectional_iterator_tag,std::pair<const Key, T>>{
 public:
   using difference_type = typename std::iterator<std::bidirectional_iterator_tag,T>::difference_type;
-  using value_type = std::pair<Key, T>;
+  using value_type = std::pair<const Key, T>;
   using ref_type = typename std::conditional<is_const,const value_type&, value_type&>::type;
   using pointer_type = typename std::conditional<is_const,const value_type*, value_type*>::type;
   using node_pointer_type = typename std::conditional<is_const,const skip_map_node<Key, T>*, skip_map_node<Key, T>*>::type;

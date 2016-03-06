@@ -4,6 +4,7 @@
 #include <memory>
 #include <utility>
 #include <array>
+#include <cassert>
 
 const size_t skip_list_size_k = 5;
 
@@ -26,24 +27,27 @@ public:
    * Constructor, invokes the default constructor and set the the entry member
    * using the provided values.
    */
-  skip_map_node(Key key, T value):skip_map_node(){
-    entry = std::make_pair(key,value);
+  skip_map_node(Key key, T value):entry{key,value}{
   }
  
   /**
    * Accessor to get the link pointer at the desired index.
-   * @param[in] i The index of the link. Must be between 0 and skip_list_size_k.
+   * @param[in] i The index of the link. Must be between 0 and 
+   * skip_list_size_k-1.
    */
   skip_map_node* link_at(size_t i) const{
+    assert(i<skip_list_size_k-1);
     return links[i];
   }
   
   /**
    * Accessor to set the link pointer at the desired index.
-   * @param[in] i The index of the link. Must be between 0 and skip_list_size_k.
+   * @param[in] i The index of the link. Must be between 0 and 
+   * skip_list_size_k-1.
    * @param[in] link The new value for the pointer.
    */
   void set_link(size_t i, skip_map_node* link){
+    assert(i<skip_list_size_k-1);
     links[i] = link;
   }
  
@@ -57,7 +61,7 @@ public:
   /**
    * The value contained within the node.
    */
-  std::pair<Key, T> entry;
+  std::pair<const Key, T> entry;
   
 private:
   /**
