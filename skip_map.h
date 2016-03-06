@@ -167,7 +167,7 @@ class skip_map {
   /**
    *
    */
-  bool size() const noexcept { return std::distance(begin(), end()); }
+  size_type size() const noexcept { return std::distance(begin(), end()); }
   
   /**
    *

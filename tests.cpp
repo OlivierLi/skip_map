@@ -22,15 +22,22 @@ TEST(insert, mixed_order){
     map.insert(element);
   };
   
-  insert_in_both({5,"fraise"});
-  insert_in_both({4,"citron"});
-  insert_in_both({2,"carotte"});
-  insert_in_both({2,"carotte"});
-  insert_in_both({1,"patate"});
-  insert_in_both({3,"lime"});
-  insert_in_both({6,"navet"});
-  insert_in_both({0,"laitue"});
-
+  std::vector<std::pair<int,std::string>> data{
+    {5,"fraise"},
+    {4,"citron"},
+    {2,"carotte"},
+    {2,"carotte"},
+    {1,"patate"},
+    {3,"lime"},
+    {6,"navet"},
+    {0,"laitue"}};
+ 
+  for(auto key_value : data){
+    insert_in_both(key_value);
+  }
+  
+  ASSERT_EQ(sm.size(), map.size());
+  
   auto sm_it = sm.cbegin();
   auto map_it = map.cbegin();
   for(;sm_it!=sm.end();++sm_it,++map_it){
