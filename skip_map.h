@@ -35,7 +35,13 @@ class skip_map {
   /**
    *
    */
-  skip_map() : end_(new skip_map_node<Key, T>),head_(end_) {}
+  skip_map():
+    end_(new skip_map_node<Key, T>),
+    rend_(new skip_map_node<Key, T>),
+    head_(end_)
+  {
+    head_->previous = rend_;
+  }
   
   ~skip_map() = default;
   
@@ -185,6 +191,8 @@ class skip_map {
       head_ = new_node;
       head_->set_link(0,end_);
       end_->previous = head_;
+      
+      head_->previous = rend_;
       return std::make_pair(iterator(new_node), true);
     }
 
@@ -199,10 +207,12 @@ class skip_map {
       
       if (key_comparator(value.first, temp->entry.first)) {
         // No previous node, we are at the head
-        if (!temp->previous) {
+        if (temp->previous == rend_) {
           new_node->set_link(0,head_);
           head_->previous = new_node;
           head_ = new_node;
+          
+          head_->previous = rend_;
         }
         // Simple case where we are inserting in the midle of the list
         else {
@@ -445,6 +455,11 @@ class skip_map {
    *
    */
   skip_map_node<Key, T>* end_;
+  
+  /**
+   *
+   */
+  skip_map_node<Key, T>* rend_;
   
   /**
    *

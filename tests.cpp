@@ -33,20 +33,16 @@ TEST(insert, mixed_order){
 
   auto sm_it = sm.cbegin();
   auto map_it = map.cbegin();
-  for(size_t i=0;i<map.size();++i){
+  for(;sm_it!=sm.end();++sm_it,++map_it){
     ASSERT_EQ(sm_it->first, map_it->first);
     ASSERT_EQ(sm_it->second, map_it->second);
-    ++sm_it;
-    ++map_it;
   }
   
   auto sm_rit = sm.rbegin();
   auto map_rit = map.rbegin();
-  for(size_t i=0;i<map.size();++i){
+  for(;sm_rit!=sm.rend();++sm_rit,++map_rit){
     ASSERT_EQ(sm_rit->first, map_rit->first);
     ASSERT_EQ(sm_rit->second, map_rit->second);
-    ++sm_rit;
-    ++map_rit;
   }
 }
 
