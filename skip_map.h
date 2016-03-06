@@ -49,10 +49,10 @@ public:
     return iterator(head_);
   }
   const_iterator begin() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return const_iterator(head_);
   }
   const_iterator cbegin() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return const_iterator(head_);
   }
 
   iterator end() noexcept {

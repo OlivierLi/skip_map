@@ -32,7 +32,7 @@ TEST(insert, mixed_order){
   insert_in_both({0,"laitue"});
 
   auto sm_it = sm.begin();
-  auto map_it = sm.begin();
+  auto map_it = map.begin();
   for(size_t i=0;i<map.size();++i){
     ASSERT_EQ(sm_it->first, map_it->first);
     ASSERT_EQ(sm_it->second, map_it->second);
