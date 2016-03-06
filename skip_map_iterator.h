@@ -1,11 +1,12 @@
 #ifndef skip_map_iterator_h
 #define skip_map_iterator_h
 
-template<class Key, class T>
+template<class Key, class T, bool is_const>
 class skip_map_iterator : public std::iterator<std::bidirectional_iterator_tag,std::pair<Key, T>>{
 public:
   using difference_type = typename std::iterator<std::bidirectional_iterator_tag,T>::difference_type;
   using value_type = std::pair<Key, T>;
+  
 
   skip_map_iterator(skip_map_node<Key, T>* p) :node(p) {}
   skip_map_iterator(const skip_map_iterator& other) : node(other.node) {}

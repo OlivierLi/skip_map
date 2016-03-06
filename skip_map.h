@@ -27,8 +27,8 @@ public:
   using pointer = typename std::allocator_traits<Allocator>::pointer;
   using const_pointer =
       typename std::allocator_traits<Allocator>::const_pointer;
-  using iterator = skip_map_iterator<Key, T>;
-  using const_iterator = const iterator;
+  using iterator = skip_map_iterator<Key, T,false>;
+  using const_iterator = skip_map_iterator<Key, T, true>;
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const iterator>;
 
@@ -67,7 +67,7 @@ public:
   }
 
   reverse_iterator rbegin() noexcept {
-    return std::reverse_iterator<skip_map_iterator<Key, T>>(end());
+    return std::reverse_iterator<iterator>(end());
   }
   const_reverse_iterator rbegin() const noexcept {
     throw std::runtime_error("Unimplemented!");
@@ -77,7 +77,7 @@ public:
   }
 
   reverse_iterator rend() noexcept {
-    return std::reverse_iterator<skip_map_iterator<Key, T>>(begin());
+    return std::reverse_iterator<iterator>(begin());
   }
   const_reverse_iterator rend() const noexcept {
     throw std::runtime_error("Unimplemented!");
