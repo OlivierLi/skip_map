@@ -9,7 +9,7 @@ TEST(insert, empty)
   skip_map<int, std::string> sm;
   auto begin = sm.begin();
   auto end = sm.end();
-  bool result  = begin == end;
+  bool result  = (begin == end);
   ASSERT_TRUE(result);
 }
 

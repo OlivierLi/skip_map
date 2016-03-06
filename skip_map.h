@@ -40,9 +40,6 @@ public:
    */
   skip_map() : end_(new skip_map_node<Key, T>),head_(end_) {}
   
-  /**
-   *
-   */
   ~skip_map() = default;
   
   /**
@@ -94,43 +91,94 @@ public:
     return begin();
   }
 
+  /**
+   * Returns an iterator to the element following the last element of the
+   * container. This element acts as a placeholder. Attempting to access it
+   * results in undefined behavior.
+   */
   iterator end() noexcept {
     return iterator(end_);
   }
   
+  /**
+   * const overload of end()
+   */
   const_iterator end() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return const_iterator(end_);
   }
+  
+  /**
+   * explicitally const verstion of end()
+   */
   const_iterator cend() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return end();
   }
 
+  /**
+   *
+   */
   reverse_iterator rbegin() noexcept {
     return std::reverse_iterator<iterator>(end());
   }
+  
+  /**
+   *
+   */
   const_reverse_iterator rbegin() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   const_reverse_iterator crbegin() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   reverse_iterator rend() noexcept {
     return std::reverse_iterator<iterator>(begin());
   }
+  
+  /**
+   *
+   */
   const_reverse_iterator rend() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   const_reverse_iterator crend() const noexcept {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   bool empty() const noexcept { return begin() == end(); }
+  
+  /**
+   *
+   */
   bool size() const noexcept { return std::distance(begin(), end()); }
+  
+  /**
+   *
+   */
   size_type max_size() const { return std::numeric_limits<size_type>::max(); }
 
+  /**
+   *
+   */
   void clear() noexcept { throw std::runtime_error("Unimplemented!"); }
 
+  /**
+   *
+   */
   std::pair<iterator, bool> insert(const value_type& value) {
     // Create new node
     auto new_node = new skip_map_node<Key, T>(value.first,value.second);
@@ -191,143 +239,285 @@ public:
   }
   */
   
+  /**
+   *
+   */
   iterator insert(const_iterator hint, const value_type& value) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   iterator insert(const_iterator hint, value_type&& value) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class InputIt>
   void insert(InputIt first, InputIt last) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   void insert(std::initializer_list<value_type> ilist) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class... Args>
   std::pair<iterator, bool> emplace(Args&&... args) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class... Args>
   iterator emplace_hint(const_iterator hint, Args&&... args) {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   iterator erase(const_iterator pos) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   void erase(iterator first, iterator last) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   size_type erase(const key_type& key) {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   void swap(skip_map& other) { throw std::runtime_error("Unimplemented!"); }
 
+  /**
+   *
+   */
   size_type count(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   size_type count(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   iterator find(const Key& key) { throw std::runtime_error("Unimplemented!"); }
   const_iterator find(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   iterator find(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   const_iterator find(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   std::pair<iterator, iterator> equal_range(const Key& key) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   std::pair<const_iterator, const_iterator> equal_range(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   std::pair<iterator, iterator> equal_range(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   std::pair<const_iterator, const_iterator> equal_range(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   iterator lower_bound(const Key& key) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   const_iterator lower_bound(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   iterator lower_bound(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   const_iterator lower_bound(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
 
+  /**
+   *
+   */
   iterator upper_bound(const Key& key) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   const_iterator upper_bound(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   iterator upper_bound(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
+  
+  /**
+   *
+   */
   template <class K>
   const_iterator upper_bound(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
 
  private:
+  /**
+   *
+   */
   Allocator allocator;
+  
+  /**
+   *
+   */
   skip_map_node<Key, T>* end_;
+  
+  /**
+   *
+   */
   skip_map_node<Key, T>* head_;
+  
+  /**
+   *
+   */
   key_compare key_comparator;
 };
 
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 bool operator==(const skip_map<Key, T, Compare, Alloc>& lhs,
                 const skip_map<Key, T, Compare, Alloc>& rhs) {
   throw std::runtime_error("Unimplemented!");
 }
+
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 bool operator!=(const skip_map<Key, T, Compare, Alloc>& lhs,
                 const skip_map<Key, T, Compare, Alloc>& rhs) {
   throw std::runtime_error("Unimplemented!");
 }
+
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 bool operator<(const skip_map<Key, T, Compare, Alloc>& lhs,
                const skip_map<Key, T, Compare, Alloc>& rhs) {
   throw std::runtime_error("Unimplemented!");
 }
+
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 bool operator<=(const skip_map<Key, T, Compare, Alloc>& lhs,
                 const skip_map<Key, T, Compare, Alloc>& rhs) {
   throw std::runtime_error("Unimplemented!");
 }
+
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 bool operator>(const skip_map<Key, T, Compare, Alloc>& lhs,
                const skip_map<Key, T, Compare, Alloc>& rhs) {
   throw std::runtime_error("Unimplemented!");
 }
+
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 bool operator>=(const skip_map<Key, T, Compare, Alloc>& lhs,
                 const skip_map<Key, T, Compare, Alloc>& rhs) {
   throw std::runtime_error("Unimplemented!");
 }
 
+/**
+ *
+ */
 template <class Key, class T, class Compare, class Alloc>
 void swap(skip_map<Key, T, Compare, Alloc>& lhs,
           skip_map<Key, T, Compare, Alloc>& rhs) {
