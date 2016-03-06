@@ -8,6 +8,9 @@
 #include "skip_map_node.h"
 #include "skip_map_iterator.h"
 
+/**
+ *
+ */
 template <class Key, class T, class Compare = std::less<Key>,
           class Allocator = std::allocator<std::pair<const Key, T>>>
 class skip_map {
@@ -30,29 +33,65 @@ public:
   using iterator = skip_map_iterator<Key, T,false>;
   using const_iterator = skip_map_iterator<Key, T, true>;
   using reverse_iterator = std::reverse_iterator<iterator>;
-  using const_reverse_iterator = std::reverse_iterator<const iterator>;
+  using const_reverse_iterator = std::reverse_iterator<reverse_iterator>;
 
+  /**
+   *
+   */
   skip_map() : end_(new skip_map_node<Key, T>),head_(end_) {}
+  
+  /**
+   *
+   */
   ~skip_map() = default;
-
+  
+  /**
+   *
+   */
   Allocator get_allocator() const { return allocator; }
-
+  
+  /**
+   *
+   */
   T& at(const Key& key) { throw std::runtime_error("Unimplemented!"); }
+  
+  /**
+   *
+   */
   const T& at(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-
+  
+  /**
+   *
+   */
   T& operator[](const Key& key) { throw std::runtime_error("Unimplemented!"); }
+  
+  /**
+   *
+   */
   T& operator[](Key&& key) { throw std::runtime_error("Unimplemented!"); }
 
+  /**
+   * Returns an iterator to the first element of the container.
+   * If the container is empty, the returned iterator will be equal to end().
+   */
   iterator begin() noexcept {
     return iterator(head_);
   }
+  
+  /**
+   * const overload of begin()
+   */
   const_iterator begin() const noexcept {
     return const_iterator(head_);
   }
+  
+  /**
+   * explicitally const version of begin()
+   */
   const_iterator cbegin() const noexcept {
-    return const_iterator(head_);
+    return begin();
   }
 
   iterator end() noexcept {
