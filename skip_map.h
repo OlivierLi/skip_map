@@ -37,10 +37,10 @@ class skip_map {
    */
   skip_map():
     end_(new skip_map_node<Key, T>),
-    rend_(new skip_map_node<Key, T>),
-    head_(end_)
+    rend_(new skip_map_node<Key, T>)
   {
-    head_->previous = rend_;
+    end_->previous = rend_;
+    rend_->set_link(0,end_);
   }
   
   ~skip_map() = default;
@@ -77,14 +77,14 @@ class skip_map {
    * If the container is empty, the returned iterator will be equal to end().
    */
   iterator begin() noexcept {
-    return iterator(head_);
+    return iterator(rend_)+1;
   }
   
   /**
    * const overload of begin()
    */
   const_iterator begin() const noexcept {
-    return const_iterator(head_);
+    return const_iterator(rend_)+1;
   }
   
   /**
@@ -185,58 +185,28 @@ class skip_map {
   std::pair<iterator, bool> insert(const value_type& value) {
     // Create new node
     auto new_node = new skip_map_node<Key, T>(value.first,value.second);
-
-    // When the list is empty
-    if (head_==end_) {
-      head_ = new_node;
-      head_->set_link(0,end_);
-      end_->previous = head_;
-      
-      head_->previous = rend_;
-      return std::make_pair(iterator(new_node), true);
-    }
-
-    skip_map_node<Key, T>* temp = head_;
-    skip_map_node<Key, T>* previous = nullptr;
-
-    while (temp != end_) {
-      
-      if(temp->entry == value){
-        return std::make_pair(iterator(temp), false);
+    
+    auto previous = iterator(rend_);
+    auto current = previous+1;
+    for(;current!=end() && key_comparator(current->first,value.first);++previous,++current){
+      if(current->first == value.first){
+        return std::make_pair(current,false);
       }
-      
-      if (key_comparator(value.first, temp->entry.first)) {
-        // No previous node, we are at the head
-        if (temp->previous == rend_) {
-          new_node->set_link(0,head_);
-          head_->previous = new_node;
-          head_ = new_node;
-          
-          head_->previous = rend_;
-        }
-        // Simple case where we are inserting in the midle of the list
-        else {
-          temp->previous->set_link(0, new_node);
-          new_node->previous = temp->previous;
-
-          temp->previous = new_node;
-          new_node->set_link(0, temp);
-        }
-        return std::make_pair(iterator(temp), true);
-      }
-
-      // Continue traversing
-      previous = temp;
-      temp = temp->link_at(0);
     }
-
-    // At this point we reached the end of the list so we simply append.
-    new_node->previous = previous;
-    previous->set_link(0, new_node);
-    new_node->set_link(0, end_);
-    end_->previous = new_node;
-
-    return std::make_pair(iterator(temp), true);
+    if(current->first == value.first && current!=end()){
+        return std::make_pair(current,false);
+    }
+    
+    skip_map_node<Key, T>* previous_p = previous.node;
+    skip_map_node<Key, T>* current_p = current.node;
+   
+    new_node->set_link(0,current_p);
+    new_node->link_at(0)->previous = new_node;
+  
+    new_node->previous = previous_p;
+    new_node->previous->set_link(0,new_node);
+    
+    return std::make_pair(iterator(new_node), true);
   }
 
   /*template <class P>
@@ -460,11 +430,6 @@ class skip_map {
    *
    */
   skip_map_node<Key, T>* rend_;
-  
-  /**
-   *
-   */
-  skip_map_node<Key, T>* head_;
   
   /**
    *

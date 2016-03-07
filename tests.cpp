@@ -13,7 +13,14 @@ TEST(insert, empty)
   ASSERT_TRUE(result);
 }
 
-TEST(insert, mixed_order){
+TEST(insert, duplicates)
+{
+  skip_map<int, std::string> sm;
+  ASSERT_TRUE(sm.insert({0,""}).second);
+  ASSERT_FALSE(sm.insert({0,""}).second);
+}
+
+TEST(iterate, mixed_order){
   skip_map<int, std::string> sm;
   std::map<int, std::string> map;
  
@@ -35,7 +42,7 @@ TEST(insert, mixed_order){
   for(auto key_value : data){
     insert_in_both(key_value);
   }
-  
+ 
   ASSERT_EQ(sm.size(), map.size());
   
   auto sm_it = sm.cbegin();
