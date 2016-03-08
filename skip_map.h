@@ -27,8 +27,8 @@ class skip_map {
   using pointer = typename std::allocator_traits<Allocator>::pointer;
   using const_pointer =
       typename std::allocator_traits<Allocator>::const_pointer;
-  
-  using iterator = skip_map_iterator<Key, T,false>;
+
+  using iterator = skip_map_iterator<Key, T, false>;
   using const_iterator = skip_map_iterator<Key, T, true>;
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
@@ -36,38 +36,36 @@ class skip_map {
   /**
    *
    */
-  skip_map():
-    end_(new skip_map_node<Key, T>),
-    rend_(new skip_map_node<Key, T>)
-  {
+  skip_map()
+      : end_(new skip_map_node<Key, T>), rend_(new skip_map_node<Key, T>) {
     end_->previous = rend_;
-    rend_->set_link(0,end_);
+    rend_->set_link(0, end_);
   }
-  
+
   ~skip_map() = default;
-  
+
   /**
    *
    */
   Allocator get_allocator() const { return allocator; }
-  
+
   /**
    *
    */
   T& at(const Key& key) { throw std::runtime_error("Unimplemented!"); }
-  
+
   /**
    *
    */
   const T& at(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   T& operator[](const Key& key) { throw std::runtime_error("Unimplemented!"); }
-  
+
   /**
    *
    */
@@ -77,103 +75,83 @@ class skip_map {
    * Returns an iterator to the first element of the container.
    * If the container is empty, the returned iterator will be equal to end().
    */
-  iterator begin() noexcept {
-    return iterator(rend_)+1;
-  }
-  
+  iterator begin() noexcept { return iterator(rend_) + 1; }
+
   /**
    * const overload of begin()
    */
-  const_iterator begin() const noexcept {
-    return const_iterator(rend_)+1;
-  }
-  
+  const_iterator begin() const noexcept { return const_iterator(rend_) + 1; }
+
   /**
    * explicitally const version of begin()
    */
-  const_iterator cbegin() const noexcept {
-    return begin();
-  }
+  const_iterator cbegin() const noexcept { return begin(); }
 
   /**
    * Returns an iterator to the element following the last element of the
    * container. This element acts as a placeholder. Attempting to access it
    * results in undefined behavior.
    */
-  iterator end() noexcept {
-    return iterator(end_);
-  }
-  
+  iterator end() noexcept { return iterator(end_); }
+
   /**
    * const overload of end()
    */
-  const_iterator end() const noexcept {
-    return const_iterator(end_);
-  }
-  
+  const_iterator end() const noexcept { return const_iterator(end_); }
+
   /**
    * explicitally const verstion of end()
    */
-  const_iterator cend() const noexcept {
-    return end();
-  }
+  const_iterator cend() const noexcept { return end(); }
 
   /**
-   * Returns a reverse iterator to the first element of the reversed container. 
-   * It corresponds to the last element of the non-reversed container.   
+   * Returns a reverse iterator to the first element of the reversed container.
+   * It corresponds to the last element of the non-reversed container.
    */
-  reverse_iterator rbegin() noexcept {
-    return reverse_iterator(end());
-  }
-  
+  reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
+
   /**
    * const overload of rbegin()
    */
   const_reverse_iterator rbegin() const noexcept {
     return const_reverse_iterator(end());
   }
-  
+
   /**
    * explicitally const verstion of begin()
    */
-  const_reverse_iterator crbegin() const noexcept {
-    return rbegin();
-  }
+  const_reverse_iterator crbegin() const noexcept { return rbegin(); }
 
   /**
-   * Returns a reverse iterator to the element following the last element of 
-   * the reversed container. It corresponds to the element preceding the first 
-   * element of the non-reversed container. This element acts as a placeholder, 
+   * Returns a reverse iterator to the element following the last element of
+   * the reversed container. It corresponds to the element preceding the first
+   * element of the non-reversed container. This element acts as a placeholder,
    * attempting to access it results in undefined behavior.
    */
-  reverse_iterator rend() noexcept {
-    return reverse_iterator(begin());
-  }
-  
+  reverse_iterator rend() noexcept { return reverse_iterator(begin()); }
+
   /**
    * const overload of rend()
    */
   const_reverse_iterator rend() const noexcept {
     return const_reverse_iterator(begin());
   }
-  
+
   /**
    * explicitally const version of rend()
    */
-  const_reverse_iterator crend() const noexcept {
-    return rend();
-  }
+  const_reverse_iterator crend() const noexcept { return rend(); }
 
   /**
    *
    */
   bool empty() const noexcept { return begin() == end(); }
-  
+
   /**
    *
    */
   size_type size() const noexcept { return std::distance(begin(), end()); }
-  
+
   /**
    *
    */
@@ -189,28 +167,29 @@ class skip_map {
    */
   std::pair<iterator, bool> insert(const value_type& value) {
     // Create new node
-    auto new_node = new skip_map_node<Key, T>(value.first,value.second);
-    
+    auto new_node = new skip_map_node<Key, T>(value.first, value.second);
+
     auto previous = iterator(rend_);
-    auto current = previous+1;
-    for(;current!=end() && key_comparator(current->first,value.first);++previous,++current){
-      if(current->first == value.first){
-        return std::make_pair(current,false);
+    auto current = previous + 1;
+    for (; current != end() && key_comparator(current->first, value.first);
+         ++previous, ++current) {
+      if (current->first == value.first) {
+        return std::make_pair(current, false);
       }
     }
-    if(current->first == value.first && current!=end()){
-        return std::make_pair(current,false);
+    if (current->first == value.first && current != end()) {
+      return std::make_pair(current, false);
     }
-    
+
     skip_map_node<Key, T>* previous_p = previous.node;
     skip_map_node<Key, T>* current_p = current.node;
-   
-    new_node->set_link(0,current_p);
+
+    new_node->set_link(0, current_p);
     new_node->link_at(0)->previous = new_node;
-  
+
     new_node->previous = previous_p;
-    new_node->previous->set_link(0,new_node);
-    
+    new_node->previous->set_link(0, new_node);
+
     return std::make_pair(iterator(new_node), true);
   }
 
@@ -219,21 +198,21 @@ class skip_map {
     throw std::runtime_error("Unimplemented!");
   }
   */
-  
+
   /**
    *
    */
   iterator insert(const_iterator hint, const value_type& value) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   iterator insert(const_iterator hint, value_type&& value) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -241,14 +220,14 @@ class skip_map {
   void insert(InputIt first, InputIt last) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   void insert(std::initializer_list<value_type> ilist) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -256,7 +235,7 @@ class skip_map {
   std::pair<iterator, bool> emplace(Args&&... args) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -271,14 +250,14 @@ class skip_map {
   iterator erase(const_iterator pos) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   void erase(iterator first, iterator last) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -297,7 +276,7 @@ class skip_map {
   size_type count(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -305,7 +284,7 @@ class skip_map {
   size_type count(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -313,7 +292,7 @@ class skip_map {
   const_iterator find(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -321,7 +300,7 @@ class skip_map {
   iterator find(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -336,14 +315,14 @@ class skip_map {
   std::pair<iterator, iterator> equal_range(const Key& key) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   std::pair<const_iterator, const_iterator> equal_range(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -351,7 +330,7 @@ class skip_map {
   std::pair<iterator, iterator> equal_range(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -366,14 +345,14 @@ class skip_map {
   iterator lower_bound(const Key& key) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   const_iterator lower_bound(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -381,7 +360,7 @@ class skip_map {
   iterator lower_bound(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -396,14 +375,14 @@ class skip_map {
   iterator upper_bound(const Key& key) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
   const_iterator upper_bound(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -411,7 +390,7 @@ class skip_map {
   iterator upper_bound(const K& x) {
     throw std::runtime_error("Unimplemented!");
   }
-  
+
   /**
    *
    */
@@ -425,17 +404,17 @@ class skip_map {
    *
    */
   Allocator allocator;
-  
+
   /**
    *
    */
   skip_map_node<Key, T>* end_;
-  
+
   /**
    *
    */
   skip_map_node<Key, T>* rend_;
-  
+
   /**
    *
    */
