@@ -6,6 +6,7 @@ class skip_map_iterator : public std::iterator<std::bidirectional_iterator_tag,s
 public:
   using difference_type = typename std::iterator<std::bidirectional_iterator_tag,T>::difference_type;
   using value_type = std::pair<const Key, T>;
+  
   using ref_type = typename std::conditional<is_const,const value_type&, value_type&>::type;
   using pointer_type = typename std::conditional<is_const,const value_type*, value_type*>::type;
   using node_pointer_type = typename std::conditional<is_const,const skip_map_node<Key, T>*, skip_map_node<Key, T>*>::type;

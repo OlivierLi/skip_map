@@ -45,13 +45,13 @@ TEST(iterate, mixed_order){
  
   ASSERT_EQ(sm.size(), map.size());
   
-  auto sm_it = sm.cbegin();
-  auto map_it = map.cbegin();
+  auto sm_it = sm.begin();
+  auto map_it = map.begin();
   for(;sm_it!=sm.end();++sm_it,++map_it){
     ASSERT_EQ(sm_it->first, map_it->first);
     ASSERT_EQ(sm_it->second, map_it->second);
   }
-  
+ 
   auto sm_rit = sm.rbegin();
   auto map_rit = map.rbegin();
   for(;sm_rit!=sm.rend();++sm_rit,++map_rit){

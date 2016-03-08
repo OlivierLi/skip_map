@@ -27,10 +27,11 @@ class skip_map {
   using pointer = typename std::allocator_traits<Allocator>::pointer;
   using const_pointer =
       typename std::allocator_traits<Allocator>::const_pointer;
+  
   using iterator = skip_map_iterator<Key, T,false>;
   using const_iterator = skip_map_iterator<Key, T, true>;
   using reverse_iterator = std::reverse_iterator<iterator>;
-  using const_reverse_iterator = std::reverse_iterator<reverse_iterator>;
+  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
   /**
    *
@@ -118,45 +119,49 @@ class skip_map {
   }
 
   /**
-   *
+   * Returns a reverse iterator to the first element of the reversed container. 
+   * It corresponds to the last element of the non-reversed container.   
    */
   reverse_iterator rbegin() noexcept {
-    return std::reverse_iterator<iterator>(end());
+    return reverse_iterator(end());
   }
   
   /**
-   *
+   * const overload of rbegin()
    */
   const_reverse_iterator rbegin() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return const_reverse_iterator(end());
   }
   
   /**
-   *
+   * explicitally const verstion of begin()
    */
   const_reverse_iterator crbegin() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return rbegin();
   }
 
   /**
-   *
+   * Returns a reverse iterator to the element following the last element of 
+   * the reversed container. It corresponds to the element preceding the first 
+   * element of the non-reversed container. This element acts as a placeholder, 
+   * attempting to access it results in undefined behavior.
    */
   reverse_iterator rend() noexcept {
-    return std::reverse_iterator<iterator>(begin());
+    return reverse_iterator(begin());
   }
   
   /**
-   *
+   * const overload of rend()
    */
   const_reverse_iterator rend() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return const_reverse_iterator(begin());
   }
   
   /**
-   *
+   * explicitally const version of rend()
    */
   const_reverse_iterator crend() const noexcept {
-    throw std::runtime_error("Unimplemented!");
+    return rend();
   }
 
   /**
