@@ -4,12 +4,19 @@
 #include "skip_map.h"
 #include "gtest/gtest.h"
 
+
 TEST(insert, empty) {
   skip_map<int, std::string> sm;
-  auto begin = sm.begin();
-  auto end = sm.end();
-  bool result = (begin == end);
-  ASSERT_TRUE(result);
+  ASSERT_EQ(sm.size(),0);
+  ASSERT_TRUE(sm.empty());
+}
+
+TEST(insert,operator){
+  skip_map<int, std::string> sm;
+  sm[0];
+  ASSERT_EQ(sm.size(), 1);
+  sm[0] = 10;
+  ASSERT_EQ(sm.size(), 1);
 }
 
 TEST(insert, duplicates) {

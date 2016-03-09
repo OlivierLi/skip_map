@@ -62,14 +62,23 @@ class skip_map {
   }
 
   /**
-   *
+   * Returns a reference to the value that is mapped to a key equivalent to key, 
+   * performing an insertion if such key does not already exist.
    */
-  T& operator[](const Key& key) { throw std::runtime_error("Unimplemented!"); }
+  T& operator[](const Key& key) {
+    auto lower_bound_it = lower_bound(key);
+    if(lower_bound_it->first == key && lower_bound_it != end()){
+      return lower_bound_it->second;
+    }
+    else{
+      return insert(value_type{key,T()}).first->second;
+    }
+  }
 
   /**
    *
    */
-  T& operator[](Key&& key) { throw std::runtime_error("Unimplemented!"); }
+  //T& operator[](Key&& key) { throw std::runtime_error("Unimplemented!"); }
 
   /**
    * Returns an iterator to the first element of the container.
@@ -143,17 +152,17 @@ class skip_map {
   const_reverse_iterator crend() const noexcept { return rend(); }
 
   /**
-   *
+   * Checks if the container has no elements
    */
   bool empty() const noexcept { return begin() == end(); }
 
   /**
-   *
+   * Returns the number of elements in the container
    */
   size_type size() const noexcept { return std::distance(begin(), end()); }
 
   /**
-   *
+   * Returns the maximum number of elements the container is able to hold.
    */
   size_type max_size() const { return std::numeric_limits<size_type>::max(); }
 
@@ -166,24 +175,18 @@ class skip_map {
    *
    */
   std::pair<iterator, bool> insert(const value_type& value) {
-    // Create new node
-    auto new_node = new skip_map_node<Key, T>(value.first, value.second);
-
-    auto previous = iterator(rend_);
-    auto current = previous + 1;
-    for (; current != end() && key_comparator(current->first, value.first);
-         ++previous, ++current) {
-      if (current->first == value.first) {
-        return std::make_pair(current, false);
-      }
-    }
+    
+    auto current = lower_bound(value.first);
     if (current->first == value.first && current != end()) {
       return std::make_pair(current, false);
     }
 
-    skip_map_node<Key, T>* previous_p = previous.node;
     skip_map_node<Key, T>* current_p = current.node;
-
+    skip_map_node<Key, T>* previous_p = current_p->previous;
+    
+    // Create new node
+    auto new_node = new skip_map_node<Key, T>(value.first, value.second);
+    
     new_node->set_link(0, current_p);
     new_node->link_at(0)->previous = new_node;
 
@@ -276,36 +279,12 @@ class skip_map {
   size_type count(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-
-  /**
-   *
-   */
-  template <class K>
-  size_type count(const K& x) const {
-    throw std::runtime_error("Unimplemented!");
-  }
-
+  
   /**
    *
    */
   iterator find(const Key& key) { throw std::runtime_error("Unimplemented!"); }
   const_iterator find(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  iterator find(const K& x) {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  const_iterator find(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
 
@@ -322,51 +301,21 @@ class skip_map {
   std::pair<const_iterator, const_iterator> equal_range(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-
-  /**
-   *
-   */
-  template <class K>
-  std::pair<iterator, iterator> equal_range(const K& x) {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  std::pair<const_iterator, const_iterator> equal_range(const K& x) const {
-    throw std::runtime_error("Unimplemented!");
-  }
-
+  
   /**
    *
    */
   iterator lower_bound(const Key& key) {
-    throw std::runtime_error("Unimplemented!");
+    auto current  = begin();
+    for (; current != end() && key_comparator(current->first, key); ++current) {
+    }
+    return current;
   }
 
   /**
    *
    */
   const_iterator lower_bound(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  iterator lower_bound(const K& x) {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  const_iterator lower_bound(const K& x) const {
-    throw std::runtime_error("Unimplemented!");
   }
 
   /**
@@ -380,22 +329,6 @@ class skip_map {
    *
    */
   const_iterator upper_bound(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  iterator upper_bound(const K& x) {
-    throw std::runtime_error("Unimplemented!");
-  }
-
-  /**
-   *
-   */
-  template <class K>
-  const_iterator upper_bound(const K& x) const {
     throw std::runtime_error("Unimplemented!");
   }
 
