@@ -46,37 +46,13 @@ TEST_F(SkipMapTest, size_when_empty){
   ASSERT_TRUE(empty.empty());
 }
 
-TEST(insert,operator){
-  skip_map<int, std::string> sm;
-  sm[0];
-  ASSERT_EQ(sm.size(), 1);
-  sm[0] = 10;
-  ASSERT_EQ(sm.size(), 1);
-}
-
-TEST(insert, duplicates) {
-  skip_map<int, std::string> sm;
-  ASSERT_TRUE(sm.insert({0, ""}).second);
-  ASSERT_FALSE(sm.insert({0, ""}).second);
-}
-
-TEST(static_case, constness) {
-  skip_map<int, std::string> sm;
-
-  static_assert(!std::is_const<decltype(sm.begin())::value_type>::value,
-                "Value type can't be const for non const iterators");
-
-  static_assert(std::is_const<decltype(sm.cbegin())::value_type>::value,
-                "Value type has to be const for const iterators");
-}
-
 TEST_F(SkipMapTest, lower_bound_full_data){
   
-  auto data =  mixed_data;
-  
+  auto& data =  mixed_data;
   auto map_pair = create_identical_maps(data);
-  auto sm = map_pair.first;
-  auto map = map_pair.second;
+  
+  auto& sm = map_pair.first;
+  auto& map = map_pair.second;
   
   for(auto key_value: data){
     ASSERT_EQ(sm.lower_bound(key_value.first)->first,
@@ -104,6 +80,30 @@ TEST_F(SkipMapTest, iterate) {
     ASSERT_EQ(sm_rit->first, map_rit->first);
     ASSERT_EQ(sm_rit->second, map_rit->second);
   }
+}
+
+TEST(insert,operator){
+  skip_map<int, std::string> sm;
+  sm[0];
+  ASSERT_EQ(sm.size(), 1);
+  sm[0] = 10;
+  ASSERT_EQ(sm.size(), 1);
+}
+
+TEST(insert, duplicates) {
+  skip_map<int, std::string> sm;
+  ASSERT_TRUE(sm.insert({0, ""}).second);
+  ASSERT_FALSE(sm.insert({0, ""}).second);
+}
+
+TEST(static_case, constness) {
+  skip_map<int, std::string> sm;
+
+  static_assert(!std::is_const<decltype(sm.begin())::value_type>::value,
+                "Value type can't be const for non const iterators");
+
+  static_assert(std::is_const<decltype(sm.cbegin())::value_type>::value,
+                "Value type has to be const for const iterators");
 }
 
 int main(int argc, char **argv) {

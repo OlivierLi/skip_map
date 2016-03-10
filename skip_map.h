@@ -189,7 +189,7 @@ class skip_map {
   std::pair<iterator, bool> insert(const value_type& value) {
     
     auto current = lower_bound(value.first);
-    if (current->first == value.first && current != end()) {
+    if (!key_comparator(value.first,current->first) && current != end()) {
       return std::make_pair(current, false);
     }
 
