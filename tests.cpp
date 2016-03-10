@@ -4,40 +4,46 @@
 #include "skip_map.h"
 #include "gtest/gtest.h"
 
-std::vector<std::pair<int , std::string>> get_data(){
-  std::vector<std::pair<int, std::string>> data{{5, "fraise"},
-                                                {4, "citron"},
-                                                {2, "carotte"},
-                                                {2, "carotte"},
-                                                {1, "patate"},
-                                                {3, "lime"},
-                                                {6, "navet"},
-                                                {0, "laitue"}};
+class SkipMapTest : public ::testing::Test {
+protected:
 
-  return data;
-}
-
-template<typename Key, typename Value>
-auto create_identical_maps(std::vector<std::pair<Key,Value>> data){
-  skip_map<Key, Value> sm;
-  std::map<Key, Value> map;
-
-  auto insert_in_both = [&sm, &map](std::pair<int, std::string> element) {
-    sm.insert(element);
-    map.insert(element);
-  };
-
-  for (auto key_value : get_data()) {
-    insert_in_both(key_value);
+  SkipMapTest(){
   }
   
-  return std::make_pair(sm, map);
-}
+  virtual ~SkipMapTest(){
+  }
+  
+  auto create_identical_maps(std::vector<std::pair<int,std::string>> data){
+    skip_map<int, std::string> sm;
+    std::map<int, std::string> map;
+    
+    auto insert_in_both = [&sm, &map](std::pair<int, std::string> element) {
+      sm.insert(element);
+      map.insert(element);
+    };
+    
+    for (auto key_value : data) {
+      insert_in_both(key_value);
+    }
+    
+    return std::make_pair(sm, map);
+  }
+  
+  skip_map<int, std::string> empty;
+  
+  std::vector<std::pair<int, std::string>> mixed_data{{5, "fraise"},
+                                                      {4, "citron"},
+                                                      {2, "carotte"},
+                                                      {2, "carotte"},
+                                                      {1, "patate"},
+                                                      {3, "lime"},
+                                                      {6, "navet"},
+                                                      {0, "laitue"}};
+};
 
-TEST(insert, empty) {
-  skip_map<int, std::string> sm;
-  ASSERT_EQ(sm.size(),0);
-  ASSERT_TRUE(sm.empty());
+TEST_F(SkipMapTest, size_when_empty){
+  ASSERT_EQ(empty.size(),0);
+  ASSERT_TRUE(empty.empty());
 }
 
 TEST(insert,operator){
@@ -64,8 +70,10 @@ TEST(static_case, constness) {
                 "Value type has to be const for const iterators");
 }
 
-TEST(lower_bound, full_data){
-  auto data = get_data();
+TEST_F(SkipMapTest, lower_bound_full_data){
+  
+  auto data =  mixed_data;
+  
   auto map_pair = create_identical_maps(data);
   auto sm = map_pair.first;
   auto map = map_pair.second;
@@ -76,8 +84,8 @@ TEST(lower_bound, full_data){
   }
 }
 
-TEST(iterate, mixed_order) {
-  auto map_pair = create_identical_maps(get_data());
+TEST_F(SkipMapTest, iterate) {
+  auto map_pair = create_identical_maps(mixed_data);
   auto sm = map_pair.first;
   auto map = map_pair.second;
   
