@@ -4,6 +4,35 @@
 #include "skip_map.h"
 #include "gtest/gtest.h"
 
+std::vector<std::pair<int , std::string>> get_data(){
+  std::vector<std::pair<int, std::string>> data{{5, "fraise"},
+                                                {4, "citron"},
+                                                {2, "carotte"},
+                                                {2, "carotte"},
+                                                {1, "patate"},
+                                                {3, "lime"},
+                                                {6, "navet"},
+                                                {0, "laitue"}};
+
+  return data;
+}
+
+template<typename Key, typename Value>
+auto create_identical_maps(std::vector<std::pair<Key,Value>> data){
+  skip_map<Key, Value> sm;
+  std::map<Key, Value> map;
+
+  auto insert_in_both = [&sm, &map](std::pair<int, std::string> element) {
+    sm.insert(element);
+    map.insert(element);
+  };
+
+  for (auto key_value : get_data()) {
+    insert_in_both(key_value);
+  }
+  
+  return std::make_pair(sm, map);
+}
 
 TEST(insert, empty) {
   skip_map<int, std::string> sm;
@@ -35,28 +64,23 @@ TEST(static_case, constness) {
                 "Value type has to be const for const iterators");
 }
 
-TEST(iterate, mixed_order) {
-  skip_map<int, std::string> sm;
-  std::map<int, std::string> map;
-
-  auto insert_in_both = [&sm, &map](std::pair<int, std::string> element) {
-    sm.insert(element);
-    map.insert(element);
-  };
-
-  std::vector<std::pair<int, std::string>> data{{5, "fraise"},
-                                                {4, "citron"},
-                                                {2, "carotte"},
-                                                {2, "carotte"},
-                                                {1, "patate"},
-                                                {3, "lime"},
-                                                {6, "navet"},
-                                                {0, "laitue"}};
-
-  for (auto key_value : data) {
-    insert_in_both(key_value);
+TEST(lower_bound, full_data){
+  auto data = get_data();
+  auto map_pair = create_identical_maps(data);
+  auto sm = map_pair.first;
+  auto map = map_pair.second;
+  
+  for(auto key_value: data){
+    ASSERT_EQ(sm.lower_bound(key_value.first)->first,
+              map.lower_bound(key_value.first)->first);
   }
+}
 
+TEST(iterate, mixed_order) {
+  auto map_pair = create_identical_maps(get_data());
+  auto sm = map_pair.first;
+  auto map = map_pair.second;
+  
   ASSERT_EQ(sm.size(), map.size());
 
   auto sm_it = sm.cbegin();

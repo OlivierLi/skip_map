@@ -60,12 +60,24 @@ class skip_map {
   const T& at(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-
+  
+  /**
+   *
+   */
+  iterator find(const Key& key) {
+    //TODO : look between upper and lower (get from local range)
+  }
+  
+  const_iterator find(const Key& key) const {
+    throw std::runtime_error("Unimplemented!");
+  }
+  
   /**
    * Returns a reference to the value that is mapped to a key equivalent to key, 
    * performing an insertion if such key does not already exist.
    */
   T& operator[](const Key& key) {
+    // TODO : use find
     auto lower_bound_it = lower_bound(key);
     if(lower_bound_it->first == key && lower_bound_it != end()){
       return lower_bound_it->second;
@@ -280,19 +292,13 @@ class skip_map {
     throw std::runtime_error("Unimplemented!");
   }
   
-  /**
-   *
-   */
-  iterator find(const Key& key) { throw std::runtime_error("Unimplemented!"); }
-  const_iterator find(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
-  }
+  
 
   /**
    *
    */
   std::pair<iterator, iterator> equal_range(const Key& key) {
-    throw std::runtime_error("Unimplemented!");
+    return std::make_pair(lower_bound(key),upper_bound(key));
   }
 
   /**
@@ -316,13 +322,14 @@ class skip_map {
    *
    */
   const_iterator lower_bound(const Key& key) const {
+    throw std::runtime_error("Unimplemented!");
   }
 
   /**
    *
    */
   iterator upper_bound(const Key& key) {
-    throw std::runtime_error("Unimplemented!");
+    //TODO : start and lower bound and go up until not equal anymore
   }
 
   /**
