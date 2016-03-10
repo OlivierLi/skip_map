@@ -13,13 +13,16 @@ protected:
   virtual ~SkipMapTest(){
   }
   
-  auto create_identical_maps(std::vector<std::pair<int,std::string>> data){
+  std::pair<skip_map<int, std::string>,std::map<int, std::string>>
+  create_identical_maps(std::vector<std::pair<int,std::string>> data){
+    
     skip_map<int, std::string> sm;
     std::map<int, std::string> map;
     
     auto insert_in_both = [&sm, &map](std::pair<int, std::string> element) {
-      sm.insert(element);
-      map.insert(element);
+      //Insert into both maps, insuring the the insertions return the
+      //same success flag
+      ASSERT_EQ(sm.insert(element).second, map.insert(element).second);
     };
     
     for (auto key_value : data) {
@@ -29,7 +32,8 @@ protected:
     return std::make_pair(sm, map);
   }
   
-  skip_map<int, std::string> empty;
+  skip_map<int, std::string> empty_skip_map;
+  std::map<int, std::string> empty_map;
   
   std::vector<std::pair<int, std::string>> mixed_data{{5, "fraise"},
                                                       {4, "citron"},
@@ -42,8 +46,12 @@ protected:
 };
 
 TEST_F(SkipMapTest, size_when_empty){
-  ASSERT_EQ(empty.size(),0);
-  ASSERT_TRUE(empty.empty());
+  ASSERT_EQ(empty_skip_map.size(), empty_map.size());
+  ASSERT_EQ(empty_skip_map.empty(), empty_map.empty());
+}
+
+TEST_F(SkipMapTest, lower_bound_empty_map){
+  ASSERT_EQ(*empty_skip_map.lower_bound(1), *empty_skip_map.end());
 }
 
 TEST_F(SkipMapTest, lower_bound_full_data){
@@ -55,8 +63,51 @@ TEST_F(SkipMapTest, lower_bound_full_data){
   auto& map = map_pair.second;
   
   for(auto key_value: data){
-    ASSERT_EQ(sm.lower_bound(key_value.first)->first,
-              map.lower_bound(key_value.first)->first);
+   
+    auto lb_it_sm =  sm.lower_bound(key_value.first);
+    auto lb_it_map = map.lower_bound(key_value.first);
+    
+    bool sm_at_end =  lb_it_sm == sm.end();
+    bool map_at_end = lb_it_map == map.end();
+    
+    //If either values had no lower bound then they both need to have no lower
+    //bound. If they have lower bounds the need to be the same
+    if( sm_at_end || map_at_end ){
+      ASSERT_TRUE(sm_at_end);
+      ASSERT_TRUE(map_at_end);
+    }
+    else{
+      ASSERT_EQ(lb_it_sm->first, lb_it_map->first);
+    }
+  }
+}
+
+
+TEST_F(SkipMapTest, upper_bound_full_data){
+  
+  auto& data =  mixed_data;
+  auto map_pair = create_identical_maps(data);
+  
+  auto& sm = map_pair.first;
+  auto& map = map_pair.second;
+  
+  for(auto key_value: data){
+    
+    auto lb_it_sm =  sm.upper_bound(key_value.first);
+    auto lb_it_map = map.upper_bound(key_value.first);
+    
+    bool sm_at_end =  lb_it_sm == sm.end();
+    bool map_at_end = lb_it_map == map.end();
+    
+    //If either values had no upper bound then they both need to have no upper
+    //bound. If they have upper bounds the need to be the same
+    if( sm_at_end || map_at_end ){
+      ASSERT_TRUE(sm_at_end);
+      ASSERT_TRUE(map_at_end);
+    }
+    else{
+      ASSERT_EQ(lb_it_sm->first, lb_it_map->first);
+    }
   }
 }
 

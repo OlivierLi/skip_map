@@ -65,7 +65,6 @@ class skip_map {
    *
    */
   iterator find(const Key& key) {
-    //TODO : look between upper and lower (get from local range)
   }
   
   const_iterator find(const Key& key) const {
@@ -329,7 +328,13 @@ class skip_map {
    *
    */
   iterator upper_bound(const Key& key) {
-    //TODO : start and lower bound and go up until not equal anymore
+    auto it = lower_bound(key);
+  
+    if(it == end()){
+      return it;
+    }
+    
+    return it+1;
   }
 
   /**
