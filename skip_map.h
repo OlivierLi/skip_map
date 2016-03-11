@@ -62,13 +62,28 @@ class skip_map {
   }
   
   /**
-   *
+   * Finds an element with key equivalent to key.
+   * Uses casting to avoid duplicated code. Safe since calls of this function
+   * have to come from a non-const object (Effective c++ item 3)
    */
   iterator find(const Key& key) {
+    const skip_map& const_this = static_cast<const skip_map &>(*this);
+    const_iterator it = const_this.find(key);
+    skip_map_node<Key, T>* ptr = const_cast<skip_map_node<Key, T>*>(it.node);
+    return iterator(ptr);
   }
   
+  /**
+   * const overload of find()
+   */
   const_iterator find(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
+    auto lower_bound_it = lower_bound(key);
+    if( !key_comparator(key, lower_bound_it->first) && lower_bound_it != end()){
+      return lower_bound_it;
+    }
+    else{
+      return end();
+    }
   }
   
   /**
@@ -76,10 +91,9 @@ class skip_map {
    * performing an insertion if such key does not already exist.
    */
   T& operator[](const Key& key) {
-    // TODO : use find
-    auto lower_bound_it = lower_bound(key);
-    if(lower_bound_it->first == key && lower_bound_it != end()){
-      return lower_bound_it->second;
+    auto it = find(key);
+    if(it!=end()){
+      return it->second;
     }
     else{
       return insert(value_type{key,T()}).first->second;
@@ -183,7 +197,8 @@ class skip_map {
   void clear() noexcept { throw std::runtime_error("Unimplemented!"); }
 
   /**
-   *
+   * Inserts element(s) into the container, if the container doesn't already 
+   * contain an element with an equivalent key.
    */
   std::pair<iterator, bool> insert(const value_type& value) {
     
@@ -290,27 +305,37 @@ class skip_map {
   size_type count(const Key& key) const {
     throw std::runtime_error("Unimplemented!");
   }
-  
-  
 
   /**
-   *
+   * Returns a pair of iterators obtained with lower_bound() and upper_bound()
    */
   std::pair<iterator, iterator> equal_range(const Key& key) {
     return std::make_pair(lower_bound(key),upper_bound(key));
   }
 
   /**
-   *
+   * const overload of equal_range()
    */
   std::pair<const_iterator, const_iterator> equal_range(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
+    return std::make_pair(lower_bound(key),upper_bound(key));
   }
   
   /**
-   *
+   * Returns an iterator pointing to the first element that is not less than key.
+   * Uses casting to avoid duplicated code. Safe since calls of this function
+   * have to come from a non-const object (Effective c++ item 3)
    */
   iterator lower_bound(const Key& key) {
+    const skip_map& const_this = static_cast<const skip_map &>(*this);
+    const_iterator it = const_this.lower_bound(key);
+    skip_map_node<Key, T>* ptr = const_cast<skip_map_node<Key, T>*>(it.node);
+    return iterator(ptr);
+  }
+
+  /**
+   * const overload of lower_bound()
+   */
+  const_iterator lower_bound(const Key& key) const {
     auto current  = begin();
     for (; current != end() && key_comparator(current->first, key); ++current) {
     }
@@ -318,16 +343,21 @@ class skip_map {
   }
 
   /**
-   *
+   * Returns an iterator pointing to the first element that is greater than key.   
+   * Uses casting to avoid duplicated code. Safe since calls of this function
+   * have to come from a non-const object (Effective c++ item 3)
    */
-  const_iterator lower_bound(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
+  iterator upper_bound(const Key& key) {
+    const skip_map& const_this = static_cast<const skip_map &>(*this);
+    const_iterator it = const_this.upper_bound(key);
+    skip_map_node<Key, T>* ptr = const_cast<skip_map_node<Key, T>*>(it.node);
+    return iterator(ptr);
   }
 
   /**
-   *
+   * const overload of upper_bound()
    */
-  iterator upper_bound(const Key& key) {
+  const_iterator upper_bound(const Key& key) const {
     auto it = lower_bound(key);
   
     if(it == end()){
@@ -335,13 +365,6 @@ class skip_map {
     }
     
     return it+1;
-  }
-
-  /**
-   *
-   */
-  const_iterator upper_bound(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
   }
 
  private:

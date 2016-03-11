@@ -111,6 +111,18 @@ TEST_F(SkipMapTest, upper_bound_full_data){
   }
 }
 
+TEST_F(SkipMapTest, find) {
+  auto map_pair = create_identical_maps(mixed_data);
+  auto sm = map_pair.first;
+  auto map = map_pair.second;
+
+  for(auto key_value : mixed_data){
+    ASSERT_EQ(sm.find(key_value.first)->first, map.find(key_value.first)->first );
+    ASSERT_EQ(sm.find(key_value.first)->second, map.find(key_value.first)->second );
+  }
+}
+
+
 TEST_F(SkipMapTest, iterate) {
   auto map_pair = create_identical_maps(mixed_data);
   auto sm = map_pair.first;
@@ -133,12 +145,12 @@ TEST_F(SkipMapTest, iterate) {
   }
 }
 
-TEST(insert,operator){
-  skip_map<int, std::string> sm;
-  sm[0];
-  ASSERT_EQ(sm.size(), 1);
-  sm[0] = 10;
-  ASSERT_EQ(sm.size(), 1);
+TEST_F(SkipMapTest,operator){
+  empty_skip_map[0];
+  ASSERT_EQ(empty_skip_map.size(), 1);
+  empty_skip_map[0] = "Test";
+  ASSERT_EQ(empty_skip_map.size(), 1);
+  ASSERT_EQ(empty_skip_map[0], "Test");
 }
 
 TEST(insert, duplicates) {
