@@ -9,7 +9,10 @@
 #include "skip_map_iterator.h"
 
 /**
- *
+ * skip_map is a sorted associative container that contains key-value pairs with 
+ * unique keys. Keys are sorted by using the comparison function Compare. 
+ * Search, removal, and insertion operations have expected logarithmic 
+ * complexity. skip_map is implemented using a skip_list.
  */
 template <class Key, class T, class Compare = std::less<Key>,
           class Allocator = std::allocator<std::pair<const Key, T>>>
