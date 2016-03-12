@@ -56,11 +56,6 @@ class skip_map {
   /**
    *
    */
-  Allocator get_allocator() const { return allocator; }
-
-  /**
-   *
-   */
   T& at(const Key& key) { throw std::runtime_error("Unimplemented!"); }
 
   /**
@@ -87,7 +82,7 @@ class skip_map {
    */
   const_iterator find(const Key& key) const {
     auto lower_bound_it = lower_bound(key);
-    if( !key_comparator(key, lower_bound_it->first) && lower_bound_it != end()){
+    if( !key_comparator_(key, lower_bound_it->first) && lower_bound_it != end()){
       return lower_bound_it;
     }
     else{
@@ -212,7 +207,7 @@ class skip_map {
   std::pair<iterator, bool> insert(const value_type& value) {
     
     auto current = lower_bound(value.first);
-    if (!key_comparator(value.first,current->first) && current != end()) {
+    if (!key_comparator_(value.first,current->first) && current != end()) {
       return std::make_pair(current, false);
     }
 
@@ -346,7 +341,7 @@ class skip_map {
    */
   const_iterator lower_bound(const Key& key) const {
     auto current  = begin();
-    for (; current != end() && key_comparator(current->first, key); ++current) {
+    for (; current != end() && key_comparator_(current->first, key); ++current) {
     }
     return current;
   }
@@ -375,24 +370,30 @@ class skip_map {
     
     return it+1;
   }
+  
+  /**
+   *
+   */
+  Allocator get_allocator() const { return allocator_; }
 
  private:
-  /**
-   * Private instance of the Allocator type used to allocate and initialize
-   * nodes
-   */
-  Allocator allocator;
   
   /**
    * Convenience function to allocate and initialize memory in the same call
    */
   template<typename... Args>
   node_type* allocate_and_init(Args&&... arguments){
-    auto ptr (allocator.allocate(sizeof(node_type)));
-    allocator.construct(ptr, arguments...);
+    auto ptr (allocator_.allocate(sizeof(node_type)));
+    allocator_.construct(ptr, arguments...);
     return ptr;
   }
-
+  
+  /**
+   * Private instance of the Allocator type used to allocate and initialize
+   * nodes
+   */
+  Allocator allocator_;
+  
   /**
    * Pointer to the element following the last element.
    */
@@ -406,7 +407,7 @@ class skip_map {
   /**
    * Instance of Compare used to compare keys
    */
-  key_compare key_comparator;
+  key_compare key_comparator_;
 };
 
 /**
