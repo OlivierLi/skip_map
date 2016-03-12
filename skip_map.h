@@ -40,18 +40,71 @@ class skip_map {
   using node_type = skip_map_node<Key, T>;
   
   /**
-   *
+   * Default constructor
    */
   skip_map():
     end_ (allocate_and_init()),
     rend_(allocate_and_init())
   {
-    
     end_->previous = rend_;
     rend_->set_link(0, end_);
   }
-
-  ~skip_map() = default;
+  
+  /**
+   * Copy constructor, performs a deep copy of the data in rhs
+   */
+  skip_map(const skip_map& rhs):
+    rend_(allocate_and_init(*rhs.rend_)),
+    end_(allocate_and_init(*rhs.end_)) {
+    
+    end_->previous = rend_;
+    rend_->set_link(0, end_);
+   
+    //TODO : Use range insert
+    for(const auto& key_value : rhs){
+      insert(key_value);
+    }
+  }
+  
+  /**
+   * Move constructor, steals all pointers of rhs
+   */
+  skip_map(const skip_map&& rhs) = delete;
+  
+  
+  /**
+   * Copy assignement operator, clears data and the performs a deep copy of the 
+   * data in rhs
+   */
+  skip_map& operator=(const skip_map& rhs){
+   
+    clear();
+    
+    rend_ = allocate_and_init(*rhs.rend_);
+    end_ = allocate_and_init(*rhs.end_);
+    
+    end_->previous = rend_;
+    rend_->set_link(0, end_);
+   
+    //TODO : Use range insert
+    for(const auto& key_value : rhs){
+      insert(key_value);
+    }
+    
+    return *this;
+  }
+  
+  /**
+   * Move assignement operator, clears data and the steals all pointers of rhs
+   */
+  skip_map& operator=(const skip_map&& rhs) =  delete;
+  
+  /**
+   * Clears all data to relase ressources
+   */
+  ~skip_map(){
+    clear();
+  }
 
   /**
    *
@@ -198,7 +251,11 @@ class skip_map {
   /**
    *
    */
-  void clear() noexcept { throw std::runtime_error("Unimplemented!"); }
+  void clear() noexcept {
+    for(auto rit = rend();rit!=rend();++rit){
+      allocator_.destroy(rit.base().node);
+    }
+  }
 
   /**
    * Inserts element(s) into the container, if the container doesn't already 
@@ -251,6 +308,7 @@ class skip_map {
    */
   template <class InputIt>
   void insert(InputIt first, InputIt last) {
+    //TODO : Implement with hint to avoid n*log(n) complexity
     throw std::runtime_error("Unimplemented!");
   }
 
@@ -416,7 +474,20 @@ class skip_map {
 template <class Key, class T, class Compare, class Alloc>
 bool operator==(const skip_map<Key, T, Compare, Alloc>& lhs,
                 const skip_map<Key, T, Compare, Alloc>& rhs) {
-  throw std::runtime_error("Unimplemented!");
+  
+  if(lhs.size() != rhs.size()){
+    return false;
+  }
+  
+  auto it1=lhs.begin();
+  auto it2=rhs.begin();
+  for(;it1!=lhs.end();++it1,++it2){
+    if(*it1 != *it2){
+      return false;
+    }
+  }
+  
+  return true;
 }
 
 /**
@@ -425,7 +496,7 @@ bool operator==(const skip_map<Key, T, Compare, Alloc>& lhs,
 template <class Key, class T, class Compare, class Alloc>
 bool operator!=(const skip_map<Key, T, Compare, Alloc>& lhs,
                 const skip_map<Key, T, Compare, Alloc>& rhs) {
-  throw std::runtime_error("Unimplemented!");
+  return !(lhs==rhs);
 }
 
 /**

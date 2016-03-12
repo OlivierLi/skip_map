@@ -35,14 +35,9 @@ protected:
   skip_map<int, std::string> empty_skip_map;
   std::map<int, std::string> empty_map;
   
-  std::vector<std::pair<int, std::string>> mixed_data{{5, "fraise"},
-                                                      {4, "citron"},
-                                                      {2, "carotte"},
-                                                      {2, "carotte"},
-                                                      {1, "patate"},
-                                                      {3, "lime"},
-                                                      {6, "navet"},
-                                                      {0, "laitue"}};
+  std::vector<std::pair<int, std::string>> mixed_data{
+    {5, "fraise"}, {4, "citron"}, {2, "carotte"}, {2, "carotte"},
+    {1, "patate"}, {3, "lime"}, {6, "navet"}, {0, "laitue"}};
 };
 
 TEST_F(SkipMapTest, size_when_empty){
@@ -144,6 +139,50 @@ TEST(static_case, constness) {
 
   static_assert(std::is_const<decltype(sm.cbegin())::value_type>::value,
                 "Value type has to be const for const iterators");
+}
+
+TEST(operators, equal){
+  skip_map<int, std::string> sm1;
+  skip_map<int, std::string> sm2;
+  ASSERT_EQ(sm1, sm2);
+ 
+  std::pair<int, std::string> key_value{1, "A"};
+  std::pair<int, std::string> key_value_2{2, "B"};
+  sm1.insert(key_value);
+  sm2.insert(key_value);
+  ASSERT_EQ(sm1,sm2);
+ 
+  sm1.insert(key_value_2);
+  ASSERT_NE(sm1, sm2);
+  
+  sm2.insert(key_value_2);
+  ASSERT_EQ(sm1, sm2);
+  
+  sm1[1] = "Not equal anymore";
+  ASSERT_NE(sm1, sm2);
+}
+
+TEST_F(SkipMapTest, copying ){
+  skip_map<int, std::string> sm1;
+  skip_map<int, std::string> sm2;
+  
+  for(const auto& pair : mixed_data){
+    sm1.insert(pair);
+  }
+ 
+  //Copy assign into sm2
+  sm2 = sm1;
+  ASSERT_EQ(sm1,sm2);
+  
+  //Copy construct into sm3
+  skip_map<int, std::string> sm3 = sm1;
+  ASSERT_EQ(sm1, sm3);
+  
+  //Verify that we have deep copies
+  sm1.begin()->second = sm1.begin()->second+"Not equal anymore!";
+  ASSERT_NE(sm1, sm2);
+  ASSERT_NE(sm1, sm3);
+  
 }
 
 int main(int argc, char **argv) {
