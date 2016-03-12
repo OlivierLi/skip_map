@@ -14,8 +14,9 @@
  * Search, removal, and insertion operations have expected logarithmic 
  * complexity. skip_map is implemented using a skip_list.
  */
-template <class Key, class T, class Compare = std::less<Key>,
-          class Allocator = std::allocator<std::pair<const Key, T>>>
+template <class Key, class T,
+          class Compare = std::less<Key>,
+          class Allocator = std::allocator<skip_map_node<Key, T>> >
 class skip_map {
  public:
   using key_type = Key;
@@ -36,11 +37,16 @@ class skip_map {
   using reverse_iterator = std::reverse_iterator<iterator>;
   using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+  using node_type = skip_map_node<Key, T>;
+  
   /**
    *
    */
-  skip_map()
-      : end_(new skip_map_node<Key, T>), rend_(new skip_map_node<Key, T>) {
+  skip_map():
+    end_ (allocate_and_init()),
+    rend_(allocate_and_init())
+  {
+    
     end_->previous = rend_;
     rend_->set_link(0, end_);
   }
@@ -72,7 +78,7 @@ class skip_map {
   iterator find(const Key& key) {
     const skip_map& const_this = static_cast<const skip_map &>(*this);
     const_iterator it = const_this.find(key);
-    skip_map_node<Key, T>* ptr = const_cast<skip_map_node<Key, T>*>(it.node);
+    node_type* ptr = const_cast<node_type*>(it.node);
     return iterator(ptr);
   }
   
@@ -210,11 +216,11 @@ class skip_map {
       return std::make_pair(current, false);
     }
 
-    skip_map_node<Key, T>* current_p = current.node;
-    skip_map_node<Key, T>* previous_p = current_p->previous;
+    node_type* current_p = current.node;
+    node_type* previous_p = current_p->previous;
     
     // Create new node
-    auto new_node = new skip_map_node<Key, T>(value.first, value.second);
+    auto new_node = allocate_and_init(value.first, value.second);
     
     new_node->set_link(0, current_p);
     new_node->link_at(0)->previous = new_node;
@@ -331,7 +337,7 @@ class skip_map {
   iterator lower_bound(const Key& key) {
     const skip_map& const_this = static_cast<const skip_map &>(*this);
     const_iterator it = const_this.lower_bound(key);
-    skip_map_node<Key, T>* ptr = const_cast<skip_map_node<Key, T>*>(it.node);
+    node_type* ptr = const_cast<node_type*>(it.node);
     return iterator(ptr);
   }
 
@@ -353,7 +359,7 @@ class skip_map {
   iterator upper_bound(const Key& key) {
     const skip_map& const_this = static_cast<const skip_map &>(*this);
     const_iterator it = const_this.upper_bound(key);
-    skip_map_node<Key, T>* ptr = const_cast<skip_map_node<Key, T>*>(it.node);
+    node_type* ptr = const_cast<node_type*>(it.node);
     return iterator(ptr);
   }
 
@@ -372,22 +378,33 @@ class skip_map {
 
  private:
   /**
-   *
+   * Private instance of the Allocator type used to allocate and initialize
+   * nodes
    */
   Allocator allocator;
-
+  
   /**
-   *
+   * Convenience function to allocate and initialize memory in the same call
    */
-  skip_map_node<Key, T>* end_;
+  template<typename... Args>
+  node_type* allocate_and_init(Args&&... arguments){
+    auto ptr (allocator.allocate(sizeof(node_type)));
+    allocator.construct(ptr, arguments...);
+    return ptr;
+  }
 
   /**
-   *
+   * Pointer to the element following the last element.
    */
-  skip_map_node<Key, T>* rend_;
+  node_type* end_;
 
   /**
-   *
+   * Pointer to the element preceding the first element.
+   */
+  node_type* rend_;
+
+  /**
+   * Instance of Compare used to compare keys
    */
   key_compare key_comparator;
 };
