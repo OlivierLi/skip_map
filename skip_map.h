@@ -67,53 +67,25 @@ class skip_map {
   }
   
   /**
-   * Move constructor, steals all pointers of rhs
+   * Move constructor, steals all pointers of rhs. Leave rhs is a state that is
+   * assignable and destructible by setting its pointer to null
    */
-  skip_map(skip_map&& rhs):rend_(rhs.rend_), end_(rhs.end_){
+  skip_map(skip_map&& rhs):
+    rend_(rhs.rend_),
+    end_(rhs.end_)
+  {
     rhs.rend_ = nullptr;
     rhs.end_ = nullptr;
   }
   
-  
   /**
-   * Copy assignement operator, clears data and the performs a deep copy of the 
-   * data in rhs
+   * Copy assignement operator. Uses the copy and swap idiom. rhs is received by
+   * copy which takes care of performing a deep copy of the data. This also
+   * saves us from defining a move assignement operator since rhs will be move 
+   * constructed when the operator is invoked with an r-value.
    */
-  skip_map& operator=(const skip_map& rhs){
-   
-    clear();
-    destroy_and_release(rend_);
-    destroy_and_release(end_);
-    
-    rend_ = allocate_and_init(*rhs.rend_);
-    end_ = allocate_and_init(*rhs.end_);
-    
-    end_->previous = rend_;
-    rend_->set_link(0, end_);
-   
-    //TODO : Use range insert
-    for(const auto& key_value : rhs){
-      insert(key_value);
-    }
-    
-    return *this;
-  }
-  
-  /**
-   * Move assignement operator, clears data and the steals all pointers of rhs
-   */
-  skip_map& operator=(skip_map&& rhs){
-    
-    clear();
-    destroy_and_release(rend_);
-    destroy_and_release(end_);
-    
-    rend_ = rhs.rend_;
-    end_ = rhs.end_;
-    
-    rhs.rend_ = nullptr;
-    rhs.end_ = nullptr;
-    
+  skip_map& operator=(skip_map rhs){
+    swap(rhs);
     return *this;
   }
   
@@ -186,12 +158,12 @@ class skip_map {
    * Returns an iterator to the first element of the container.
    * If the container is empty, the returned iterator will be equal to end().
    */
-  iterator begin() noexcept { return iterator(rend_) + 1; }
+  iterator begin() noexcept { return std::next(iterator(rend_)); }
 
   /**
    * const overload of begin()
    */
-  const_iterator begin() const noexcept { return const_iterator(rend_) + 1; }
+  const_iterator begin() const noexcept { return std::next(const_iterator(rend_)); }
 
   /**
    * explicitally const version of begin()
@@ -292,7 +264,9 @@ class skip_map {
       //Work on a local copy and increment rit right now
       auto temp = rit;
       ++rit;
-      
+     
+      // Get equivalent non-reverse iterator to access its node for destruction
+      // and freeing
       auto ptr = std::prev(temp.base()).node;
       destroy_and_release(ptr);
     }
@@ -360,6 +334,7 @@ class skip_map {
    *
    */
   void insert(std::initializer_list<value_type> ilist) {
+    //TODO : Implement with hint to avoid n*log(n) complexity
     throw std::runtime_error("Unimplemented!");
   }
 
@@ -403,7 +378,10 @@ class skip_map {
   /**
    *
    */
-  void swap(skip_map& other) { throw std::runtime_error("Unimplemented!"); }
+  void swap(skip_map& other) {
+    std::swap(rend_,other.rend_);
+    std::swap(end_,other.end_);
+  }
 
   /**
    *
@@ -524,7 +502,9 @@ class skip_map {
 };
 
 /**
- *
+ * Checks if the contents of lhs and rhs are equal, that is, whether lhs.size() 
+ * == rhs.size() and each element in lhs compares equal with the element in rhs 
+ * at the same position.
  */
 template <class Key, class T, class Compare, class Alloc>
 bool operator==(const skip_map<Key, T, Compare, Alloc>& lhs,
@@ -546,7 +526,7 @@ bool operator==(const skip_map<Key, T, Compare, Alloc>& lhs,
 }
 
 /**
- *
+ * Verifies that lhs and rhs are not equal. Uses the operartor ==
  */
 template <class Key, class T, class Compare, class Alloc>
 bool operator!=(const skip_map<Key, T, Compare, Alloc>& lhs,
@@ -596,7 +576,8 @@ bool operator>=(const skip_map<Key, T, Compare, Alloc>& lhs,
 template <class Key, class T, class Compare, class Alloc>
 void swap(skip_map<Key, T, Compare, Alloc>& lhs,
           skip_map<Key, T, Compare, Alloc>& rhs) {
-  throw std::runtime_error("Unimplemented!");
+  std::swap(lhs.rend_,rhs.rend_);
+  std::swap(lhs.end_, rhs.end_);
 }
 
 #endif /* skip_map_h */

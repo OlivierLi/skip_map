@@ -208,7 +208,7 @@ TEST_F(SkipMapTest, move_assignment ){
   //move assign into sm2
   skip_map<int, std::string> bak = sm1;
   skip_map<int, std::string> sm2;
-  sm2 =  std::move(sm1);
+  sm2 = std::move(sm1);
   ASSERT_EQ(sm2,bak);
 }
 
