@@ -226,6 +226,8 @@ TEST_F(SkipMapTest, clear){
 }
 
 int main(int argc, char **argv) {
+  std::string filter("*");
+  ::testing::GTEST_FLAG(filter) = filter;
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

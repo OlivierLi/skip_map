@@ -82,6 +82,8 @@ class skip_map {
   skip_map& operator=(const skip_map& rhs){
    
     clear();
+    destroy_and_release(rend_);
+    destroy_and_release(end_);
     
     rend_ = allocate_and_init(*rhs.rend_);
     end_ = allocate_and_init(*rhs.end_);
@@ -101,7 +103,10 @@ class skip_map {
    * Move assignement operator, clears data and the steals all pointers of rhs
    */
   skip_map& operator=(skip_map&& rhs){
+    
     clear();
+    destroy_and_release(rend_);
+    destroy_and_release(end_);
     
     rend_ = rhs.rend_;
     end_ = rhs.end_;
@@ -264,7 +269,8 @@ class skip_map {
   size_type max_size() const { return std::numeric_limits<size_type>::max(); }
 
   /**
-   *
+   * Removes all elements from the container. This particular implementation
+   * does not invalidate past-the-end iterators
    */
   void clear() noexcept {
   
@@ -280,7 +286,7 @@ class skip_map {
     }
    
     //Use the base iterator while going in reverse order to release every node
-    for(auto rit = rbegin();rit!=std::prev(rend());){
+    for(auto rit = rbegin();rit!=rend();){
      
       //Deleting the node invalidates rit
       //Work on a local copy and increment rit right now
@@ -490,8 +496,8 @@ class skip_map {
    */
   void destroy_and_release(node_type* ptr){
     if(ptr){
-        allocator_.destroy(ptr);
-        allocator_.deallocate(ptr, sizeof(node_type));
+      allocator_.destroy(ptr);
+      allocator_.deallocate(ptr, sizeof(node_type));
     }
   }
   
