@@ -117,6 +117,8 @@ class skip_map {
    */
   ~skip_map(){
     clear();
+    destroy_and_release(rend_);
+    destroy_and_release(end_);
   }
 
   /**
@@ -265,9 +267,32 @@ class skip_map {
    *
    */
   void clear() noexcept {
-    for(auto rit = rend();rit!=rend();++rit){
-      allocator_.destroy(rit.base().node);
+  
+    // If we have a null first pointer it's because the contents were moved out
+    // There is no destruction or dealocating to do
+    if(rend_ == nullptr){
+      return;
     }
+  
+    //If we have nothing to delete
+    if(empty()){
+      return;
+    }
+   
+    //Use the base iterator while going in reverse order to release every node
+    for(auto rit = rbegin();rit!=std::prev(rend());){
+     
+      //Deleting the node invalidates rit
+      //Work on a local copy and increment rit right now
+      auto temp = rit;
+      ++rit;
+      
+      auto ptr = std::prev(temp.base()).node;
+      destroy_and_release(ptr);
+    }
+   
+    end_->previous = rend_;
+    rend_->set_link(0, end_);
   }
 
   /**
@@ -457,6 +482,17 @@ class skip_map {
     auto ptr (allocator_.allocate(sizeof(node_type)));
     allocator_.construct(ptr, arguments...);
     return ptr;
+  }
+  
+  /**
+   * Convenience function to destroy a node object and deallocate in the same 
+   * call.
+   */
+  void destroy_and_release(node_type* ptr){
+    if(ptr){
+        allocator_.destroy(ptr);
+        allocator_.deallocate(ptr, sizeof(node_type));
+    }
   }
   
   /**

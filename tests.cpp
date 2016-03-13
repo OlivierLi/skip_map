@@ -212,6 +212,19 @@ TEST_F(SkipMapTest, move_assignment ){
   ASSERT_EQ(sm2,bak);
 }
 
+TEST_F(SkipMapTest, clear){
+  skip_map<int, std::string> sm;
+  
+  for(const auto& pair : mixed_data){
+    sm.insert(pair);
+  }
+ 
+  sm.clear();
+  
+  ASSERT_TRUE(sm.empty());
+  ASSERT_EQ(sm.size(),0);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
