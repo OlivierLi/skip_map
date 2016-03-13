@@ -117,7 +117,7 @@ TEST_F(SkipMapTest, iterate) {
   }
 }
 
-TEST_F(SkipMapTest,operator){
+TEST_F(SkipMapTest,insert_with_operator){
   empty_skip_map[0];
   ASSERT_EQ(empty_skip_map.size(), 1);
   empty_skip_map[0] = "Test";
@@ -183,6 +183,33 @@ TEST_F(SkipMapTest, copying ){
   ASSERT_NE(sm1, sm2);
   ASSERT_NE(sm1, sm3);
   
+}
+
+TEST_F(SkipMapTest, move_construction ){
+  skip_map<int, std::string> sm1;
+  
+  for(const auto& pair : mixed_data){
+    sm1.insert(pair);
+  }
+  
+  //move assign into sm2
+  skip_map<int, std::string> bak = sm1;
+  skip_map<int, std::string> sm2(std::move(sm1));
+  ASSERT_EQ(sm2,bak);
+}
+
+TEST_F(SkipMapTest, move_assignment ){
+  skip_map<int, std::string> sm1;
+  
+  for(const auto& pair : mixed_data){
+    sm1.insert(pair);
+  }
+  
+  //move assign into sm2
+  skip_map<int, std::string> bak = sm1;
+  skip_map<int, std::string> sm2;
+  sm2 =  std::move(sm1);
+  ASSERT_EQ(sm2,bak);
 }
 
 int main(int argc, char **argv) {

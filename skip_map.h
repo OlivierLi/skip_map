@@ -69,7 +69,10 @@ class skip_map {
   /**
    * Move constructor, steals all pointers of rhs
    */
-  skip_map(const skip_map&& rhs) = delete;
+  skip_map(skip_map&& rhs):rend_(rhs.rend_), end_(rhs.end_){
+    rhs.rend_ = nullptr;
+    rhs.end_ = nullptr;
+  }
   
   
   /**
@@ -97,7 +100,17 @@ class skip_map {
   /**
    * Move assignement operator, clears data and the steals all pointers of rhs
    */
-  skip_map& operator=(const skip_map&& rhs) =  delete;
+  skip_map& operator=(skip_map&& rhs){
+    clear();
+    
+    rend_ = rhs.rend_;
+    end_ = rhs.end_;
+    
+    rhs.rend_ = nullptr;
+    rhs.end_ = nullptr;
+    
+    return *this;
+  }
   
   /**
    * Clears all data to relase ressources
