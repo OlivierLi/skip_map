@@ -458,7 +458,7 @@ class skip_map {
   template<typename... Args>
   node_type* allocate_and_init(Args&&... arguments){
     auto ptr (allocator_.allocate(sizeof(node_type)));
-    allocator_.construct(ptr, arguments...);
+    allocator_.construct(ptr, std::forward<Args>(arguments)...);
     return ptr;
   }
   
