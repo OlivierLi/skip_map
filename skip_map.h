@@ -53,13 +53,7 @@ class skip_map {
   /**
    * Copy constructor, performs a deep copy of the data in rhs
    */
-  skip_map(const skip_map& rhs):
-    rend_(allocate_and_init(*rhs.rend_)),
-    end_(allocate_and_init(*rhs.end_)) {
-    
-    end_->previous = rend_;
-    rend_->set_link(0, end_);
-   
+  skip_map(const skip_map& rhs):skip_map(){
     //TODO : Use range insert
     for(const auto& key_value : rhs){
       insert(key_value);
