@@ -8,6 +8,8 @@
 #include "skip_map_node.h"
 #include "skip_map_iterator.h"
 
+
+
 /**
  * skip_map is a sorted associative container that contains key-value pairs with 
  * unique keys. Keys are sorted by using the comparison function Compare. 
@@ -250,23 +252,12 @@ class skip_map {
     if(empty()){
       return;
     }
-   
-    //Use the base iterator while going in reverse order to release every node
-    for(auto rit = rbegin();rit!=rend();){
-     
-      //Deleting the node invalidates rit
-      //Work on a local copy and increment rit right now
-      auto temp = rit;
-      ++rit;
-     
-      // Get equivalent non-reverse iterator to access its node for destruction
-      // and freeing
-      auto ptr = std::prev(temp.base()).node;
-      destroy_and_release(ptr);
+ 
+    //Remove the nodes one by one until we are left with the end
+    auto it=begin();
+    while(it!=end()){
+      it = erase(it);
     }
-   
-    end_->previous = rend_;
-    rend_->set_link(0, end_);
   }
 
   /**
@@ -351,8 +342,21 @@ class skip_map {
   /**
    *
    */
-  iterator erase(const_iterator pos) {
-    throw std::runtime_error("Unimplemented!");
+  iterator erase(iterator pos) {
+    //Don't delete past the end, past the beginning nodes
+    if(pos==iterator(rend_) || pos==end()){
+      return end();
+    }
+    
+    node_type* next = pos.node->link_at(0);
+    node_type* previous = pos.node->previous;
+    
+    previous->set_link(0,next);
+    next->previous =  previous;
+    
+    destroy_and_release(pos.node);
+    
+    return iterator(next);
   }
 
   /**
@@ -366,7 +370,14 @@ class skip_map {
    *
    */
   size_type erase(const key_type& key) {
-    throw std::runtime_error("Unimplemented!");
+    
+    auto it = find(key);
+    if(it==end()){
+      return size();
+    }
+    erase(it);
+    
+    return size();
   }
 
   /**

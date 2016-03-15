@@ -225,6 +225,27 @@ TEST_F(SkipMapTest, clear){
   ASSERT_EQ(sm.size(),0);
 }
 
+TEST_F(SkipMapTest, erase){
+  auto& data =  mixed_data;
+  auto map_pair = create_identical_maps(data);
+  
+  auto& sm = map_pair.first;
+  auto& map = map_pair.second;
+
+  for(const auto& key_value : mixed_data){
+    sm.erase(key_value.first);
+    map.erase(key_value.first);
+    
+    ASSERT_EQ(sm.size(), map.size());
+    auto it1=sm.begin();
+    auto it2=map.begin();
+    for(;it1!=sm.end();++it1,++it2){
+      ASSERT_EQ(*it1, *it2);
+    }  
+  }
+  
+}
+
 int main(int argc, char **argv) {
   std::string filter("*");
   ::testing::GTEST_FLAG(filter) = filter;
