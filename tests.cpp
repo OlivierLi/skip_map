@@ -4,6 +4,48 @@
 #include "skip_map.h"
 #include "gtest/gtest.h"
 
+/**
+ * This test fixture provides a hand constructed instance of skip_map.
+ * The goal of this is to ensure that the operations owrk on valid instance
+ * and not only returns the right result but operates in the correct number
+ * of steps
+ */
+class ConstructedTest : public ::testing::Test {
+protected:
+
+  ConstructedTest(){
+    
+    //Start by normally adding the values
+    for(auto i : ordered_keys){
+      sm.insert({i,std::to_string(i)});
+    }
+   
+    //Set the forward links manually
+    sm.rend_->set_link(1, sm.find(6).node);
+    sm.rend_->set_link(2, sm.find(6).node);
+    sm.rend_->set_link(3, sm.find(6).node);
+   
+    sm.find(6).node->set_link(1, sm.find(9).node);
+    sm.find(6).node->set_link(2, sm.find(25).node);
+    sm.find(6).node->set_link(3, sm.end_);
+    
+    sm.find(6).node->set_link(1, sm.find(17).node);
+    
+    sm.find(17).node->set_link(1, sm.find(25).node);
+    
+    sm.find(25).node->set_link(1, sm.end_);
+    sm.find(25).node->set_link(2, sm.end_);
+    
+  }
+  
+  virtual ~ConstructedTest(){
+  }
+ 
+  std::vector<int> ordered_keys{3,6,7,9,12,17,19,21,25,26};
+  skip_map<int, std::string> sm;
+};
+
+
 class SkipMapTest : public ::testing::Test {
 protected:
 
@@ -39,6 +81,13 @@ protected:
     {5, "fraise"}, {4, "citron"}, {2, "carotte"}, {2, "carotte"},
     {1, "patate"}, {3, "lime"}, {6, "navet"}, {0, "laitue"}};
 };
+
+TEST_F(ConstructedTest, find){
+  for(auto key : ordered_keys){
+    ASSERT_EQ(sm.find(key)->first,key);
+    ASSERT_EQ(sm.find(key)->second,std::to_string(key));
+  }
+}
 
 TEST_F(SkipMapTest, size_when_empty){
   ASSERT_EQ(empty_skip_map.size(), empty_map.size());

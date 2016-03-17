@@ -6,7 +6,7 @@
 #include <array>
 #include <cassert>
 
-const size_t skip_list_size_k = 5;
+const size_t skip_list_size_k = 4;
 
 /**
  * The class that represents a node in the skip list. This class provides the
@@ -30,21 +30,21 @@ class skip_map_node {
   /**
    * Accessor to get the link pointer at the desired index.
    * @param[in] i The index of the link. Must be between 0 and
-   * skip_list_size_k-1.
+   * skip_list_size_k-1 inclusively.
    */
   skip_map_node* link_at(size_t i) const {
-    assert(i < skip_list_size_k - 1);
+    assert(i <= skip_list_size_k - 1);
     return links[i];
   }
 
   /**
    * Accessor to set the link pointer at the desired index.
    * @param[in] i The index of the link. Must be between 0 and
-   * skip_list_size_k-1.
+   * skip_list_size_k-1 inclusively.
    * @param[in] link The new value for the pointer.
    */
   void set_link(size_t i, skip_map_node* link) {
-    assert(i < skip_list_size_k - 1);
+    assert(i <= skip_list_size_k - 1);
     links[i] = link;
   }
 

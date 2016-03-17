@@ -13,12 +13,12 @@ class skip_map_iterator
       typename std::conditional<is_const, const skip_map_node<Key, Value>*,
                                 skip_map_node<Key, Value>*>::type;
 
-  skip_map_iterator(skip_map_node<Key, Value>* p) : node(p) {}
+  skip_map_iterator(skip_map_node<Key, Value>* p, size_t level=0) : node(p), level_(level) {}
   skip_map_iterator(const skip_map_iterator<Key, Value, false>& other)
-      : node(other.node) {}
+      : node(other.node), level_(other.level_) {}
 
   skip_map_iterator& operator++() {
-    node = node->link_at(0);
+    node = node->link_at(level_);
     return *this;
   }
   skip_map_iterator operator++(int) {
@@ -73,6 +73,7 @@ class skip_map_iterator
 
   // private:
   node_pointer_type node;
+  size_t level_;
 };
 
 #endif /* skip_map_iterator_h */

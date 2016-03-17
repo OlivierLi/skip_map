@@ -8,8 +8,6 @@
 #include "skip_map_node.h"
 #include "skip_map_iterator.h"
 
-
-
 /**
  * skip_map is a sorted associative container that contains key-value pairs with 
  * unique keys. Keys are sorted by using the comparison function Compare. 
@@ -392,7 +390,10 @@ class skip_map {
    *
    */
   size_type count(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
+    if( find(key) == end()){
+      return 0;
+    }
+    return 1;
   }
 
   /**
@@ -425,6 +426,9 @@ class skip_map {
    * const overload of lower_bound()
    */
   const_iterator lower_bound(const Key& key) const {
+    
+    //Try each level, starting from the top one
+    
     auto current  = begin();
     for (; current != end() && key_comparator_(current->first, key); ++current) {
     }
@@ -504,6 +508,9 @@ class skip_map {
    * Instance of Compare used to compare keys
    */
   key_compare key_comparator_;
+  
+  // Define friend classes only for unit testing purposes
+  friend class ConstructedTest;
 };
 
 /**
