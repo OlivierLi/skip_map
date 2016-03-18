@@ -76,9 +76,13 @@ class skip_map_iterator
   value_type& operator*() { return node->entry; }
   value_type* operator->() { return &node->entry; }
 
-  void go_down() {}
+  void go_down() {
+    --level_;
+  }
 
-  void go_up() {}
+  void go_up() {
+    ++level_;
+  }
 
   node_pointer_type get() { return node; }
 

@@ -29,7 +29,7 @@ protected:
     sm.find(6).node->set_link(2, sm.find(25).node);
     sm.find(6).node->set_link(3, sm.end_);
     
-    sm.find(6).node->set_link(1, sm.find(17).node);
+    sm.find(9).node->set_link(1, sm.find(17).node);
     
     sm.find(17).node->set_link(1, sm.find(25).node);
     
@@ -91,20 +91,24 @@ TEST_F(ConstructedTest, find){
   
   //Then we verify that the iterator go over the skip_list in the correct way
   using iterator = skip_map<int, std::string>::iterator;
-  
-  {
+ 
+  //Test top level
   iterator it(sm.rend_,3);
   ASSERT_EQ((it+1),sm.find(6));
   ASSERT_EQ((it+2),sm.end());
-  }
-  
-  {
-  iterator it(sm.rend_,2);
+ 
+  //Go down and test lower level
+  it.go_down();
   ASSERT_EQ((it+1),sm.find(6));
   ASSERT_EQ((it+2),sm.find(25));
   ASSERT_EQ((it+3),sm.end());
-    
-  }
+  
+  it.go_down();
+  ASSERT_EQ((it+1),sm.find(6));
+  ASSERT_EQ((it+2),sm.find(9));
+  ASSERT_EQ((it+3),sm.find(17));
+  ASSERT_EQ((it+4),sm.find(25));
+  ASSERT_EQ((it+5),sm.end());
 }
 
 TEST_F(SkipMapTest, size_when_empty){
