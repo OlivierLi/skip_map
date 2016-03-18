@@ -83,9 +83,27 @@ protected:
 };
 
 TEST_F(ConstructedTest, find){
+  // First of all make sure that all data was inserted correctly
   for(auto key : ordered_keys){
     ASSERT_EQ(sm.find(key)->first,key);
     ASSERT_EQ(sm.find(key)->second,std::to_string(key));
+  }
+  
+  //Then we verify that the iterator go over the skip_list in the correct way
+  using iterator = skip_map<int, std::string>::iterator;
+  
+  {
+  iterator it(sm.rend_,3);
+  ASSERT_EQ((it+1),sm.find(6));
+  ASSERT_EQ((it+2),sm.end());
+  }
+  
+  {
+  iterator it(sm.rend_,2);
+  ASSERT_EQ((it+1),sm.find(6));
+  ASSERT_EQ((it+2),sm.find(25));
+  ASSERT_EQ((it+3),sm.end());
+    
   }
 }
 

@@ -7,6 +7,7 @@
 #include <functional>
 #include "skip_map_node.h"
 #include "skip_map_iterator.h"
+#include <gtest/gtest_prod.h>
 
 /**
  * skip_map is a sorted associative container that contains key-value pairs with 
@@ -112,7 +113,7 @@ class skip_map {
   iterator find(const Key& key) {
     const skip_map& const_this = static_cast<const skip_map &>(*this);
     const_iterator it = const_this.find(key);
-    node_type* ptr = const_cast<node_type*>(it.node);
+    node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
   
@@ -269,7 +270,7 @@ class skip_map {
       return std::make_pair(current, false);
     }
 
-    node_type* current_p = current.node;
+    node_type* current_p = current.get();
     node_type* previous_p = current_p->previous;
     
     // Create new node
@@ -346,13 +347,13 @@ class skip_map {
       return end();
     }
     
-    node_type* next = pos.node->link_at(0);
-    node_type* previous = pos.node->previous;
+    node_type* next = pos.get()->link_at(0);
+    node_type* previous = pos.get()->previous;
     
     previous->set_link(0,next);
     next->previous =  previous;
     
-    destroy_and_release(pos.node);
+    destroy_and_release(pos.get());
     
     return iterator(next);
   }
@@ -418,7 +419,7 @@ class skip_map {
   iterator lower_bound(const Key& key) {
     const skip_map& const_this = static_cast<const skip_map &>(*this);
     const_iterator it = const_this.lower_bound(key);
-    node_type* ptr = const_cast<node_type*>(it.node);
+    node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
 
@@ -443,7 +444,7 @@ class skip_map {
   iterator upper_bound(const Key& key) {
     const skip_map& const_this = static_cast<const skip_map &>(*this);
     const_iterator it = const_this.upper_bound(key);
-    node_type* ptr = const_cast<node_type*>(it.node);
+    node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
 
@@ -511,6 +512,7 @@ class skip_map {
   
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;
+  FRIEND_TEST(ConstructedTest, find);
 };
 
 /**

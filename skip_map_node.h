@@ -19,7 +19,7 @@ class skip_map_node {
   /**
    * The default constructor, only initilializes member variables
    */
-  skip_map_node() : links{nullptr}, previous{nullptr}, entry{0, ""} {}
+  skip_map_node() : links{nullptr}, previous{nullptr}, entry{Key(), T()} {}
 
   /**
    * Constructor, sets the the entry member using the provided values.
