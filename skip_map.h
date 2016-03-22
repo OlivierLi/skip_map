@@ -3,6 +3,7 @@
 
 #include <limits>
 #include <array>
+#include <vector>
 #include <exception>
 #include <functional>
 #include "skip_map_node.h"
@@ -45,7 +46,8 @@ class skip_map {
    */
   skip_map():
     end_ (allocate_and_init()),
-    rend_(allocate_and_init())
+    rend_(allocate_and_init()),
+    max_level_(0)
   {
     end_->previous = rend_;
     rend_->set_link(0, end_);
@@ -59,6 +61,7 @@ class skip_map {
     for(const auto& key_value : rhs){
       insert(key_value);
     }
+    max_level_ = rhs.max_level_;
   }
   
   /**
@@ -422,17 +425,38 @@ class skip_map {
     node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
+ 
+  //Find all the links that would be cutoff by an insertion
+  std::vector<const_iterator> splice(const Key& key) const{
+   
+    std::vector<const_iterator> links;
+    
+    const_iterator start(rend_,max_level_);
+    for(size_t i=0;i<=max_level_;++i){
+      
+      //Access the fist non terminal node on the level
+      auto temp = start;
+      
+      //Advance as far as we can without reaching the end or going over
+      while(temp+1 != end() && key_comparator_((temp+1)->first, key)){
+        ++temp;
+      }
+    
+      links.emplace_back(temp);
+     
+      start.go_down();
+    }
+  
+    return links;
+  }
 
   /**
    * const overload of lower_bound()
    */
   const_iterator lower_bound(const Key& key) const {
     
-    //Try each level, starting from the top one
-    
     auto current  = begin();
-    for (; current != end() && key_comparator_(current->first, key); ++current) {
-    }
+    for (; current != end() && key_comparator_(current->first, key); ++current) {}
     return current;
   }
 
@@ -504,7 +528,9 @@ class skip_map {
    * Pointer to the element preceding the first element.
    */
   node_type* rend_;
-
+ 
+  size_type max_level_;
+ 
   /**
    * Instance of Compare used to compare keys
    */
@@ -512,7 +538,8 @@ class skip_map {
   
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;
-  FRIEND_TEST(ConstructedTest, find);
+  FRIEND_TEST(ConstructedTest, iterate);
+  FRIEND_TEST(ConstructedTest, splice);
 };
 
 /**

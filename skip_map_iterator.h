@@ -1,6 +1,8 @@
 #ifndef skip_map_iterator_h
 #define skip_map_iterator_h
 
+#include <gtest/gtest_prod.h>
+
 template <typename Key, typename Value, bool is_const,
           typename value_type = typename std::conditional<
               is_const, const std::pair<const Key, Value>,
@@ -19,7 +21,10 @@ class skip_map_iterator
       : node(other.node), level_(other.level_) {}
 
   skip_map_iterator& operator++() {
-    node = node->link_at(level_);
+    // Do not iterate into nullptr
+    if(node->link_at(level_)){
+      node = node->link_at(level_);
+    }
     return *this;
   }
   skip_map_iterator operator++(int) {
@@ -29,7 +34,10 @@ class skip_map_iterator
   }
 
   skip_map_iterator& operator--() {
-    node = node->previous;
+    // Do not iterate into nullptr
+    if(node->previous){
+      node = node->previous;
+    }
     return *this;
   }
   skip_map_iterator operator--(int) {
@@ -88,6 +96,7 @@ class skip_map_iterator
 
   // Friend classes only for unit tests
   friend class ConstructedTest;
+  FRIEND_TEST(ConstructedTest, splice);
 
 private :
   node_pointer_type node;
