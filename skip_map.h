@@ -425,39 +425,13 @@ class skip_map {
     node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
- 
-  //Find all the links that would be cutoff by an insertion
-  std::vector<const_iterator> splice(const Key& key) const{
-   
-    std::vector<const_iterator> links;
-    
-    const_iterator start(rend_,max_level_);
-    for(size_t i=0;i<=max_level_;++i){
-      
-      //Access the fist non terminal node on the level
-      auto temp = start;
-      
-      //Advance as far as we can without reaching the end or going over
-      while(temp+1 != end() && key_comparator_((temp+1)->first, key)){
-        ++temp;
-      }
-    
-      links.emplace_back(temp);
-     
-      start.go_down();
-    }
-  
-    return links;
-  }
 
   /**
    * const overload of lower_bound()
    */
   const_iterator lower_bound(const Key& key) const {
-    
-    auto current  = begin();
-    for (; current != end() && key_comparator_(current->first, key); ++current) {}
-    return current;
+    auto splice_vec =  splice(key);
+    return splice_vec.back()+1;
   }
 
   /**
@@ -491,6 +465,33 @@ class skip_map {
   Allocator get_allocator() const { return allocator_; }
 
  private:
+ 
+  /**
+   * Return lower bound of each level by key.
+   */
+  std::vector<const_iterator> splice(const Key& key) const{
+  
+    std::vector<const_iterator> lower_bounds;
+   
+    //Start at the top level and go down every level
+    const_iterator start(rend_,max_level_);
+    for(size_t i=0;i<=max_level_;++i){
+      
+      //Access the fist non terminal node on the level
+      auto temp = start;
+      
+      //Advance as far as we can without reaching the end or going over
+      while(temp+1 != end() && key_comparator_((temp+1)->first, key)){
+        ++temp;
+      }
+    
+      lower_bounds.emplace_back(temp);
+     
+      start.go_down();
+    }
+  
+    return lower_bounds;
+  }
   
   /**
    * Convenience function to allocate and initialize memory in the same call
