@@ -115,12 +115,12 @@ TEST_F(ConstructedTest, iterate){
 }
 
 TEST_F(ConstructedTest, splice){
-  std::vector<skip_map<int, std::string>::const_iterator> splice;
+  std::vector<skip_map<int, std::string>::iterator> splice;
  
   // Empty map means 17 would be inserted on level 17 just after rend_
   splice = empty.splice(17);
   ASSERT_EQ(splice.size(),1);
-  auto rend = skip_map<int, std::string>::const_iterator(empty.rend_);
+  auto rend = skip_map<int, std::string>::iterator(empty.rend_);
   ASSERT_EQ(splice[0], rend );
   
   splice = sm.splice(17);

@@ -148,11 +148,6 @@ class skip_map {
   }
 
   /**
-   *
-   */
-  //T& operator[](Key&& key) { throw std::runtime_error("Unimplemented!"); }
-
-  /**
    * Returns an iterator to the first element of the container.
    * If the container is empty, the returned iterator will be equal to end().
    */
@@ -272,27 +267,21 @@ class skip_map {
     if (!key_comparator_(value.first,current->first) && current != end()) {
       return std::make_pair(current, false);
     }
-
-    node_type* current_p = current.get();
-    node_type* previous_p = current_p->previous;
     
     // Create new node
     auto new_node = allocate_and_init(value.first, value.second);
-    
-    new_node->set_link(0, current_p);
+    auto split_vec = splice(value.first);
+    for(auto it : split_vec ){
+      //TODO : Deduplicate code in versions of splice()
+      //TODO : Choose a level for the new node
+      new_node->set_link(it.level_, (it+1).get());
+      it.get()->set_link(it.level_,new_node);
+    }
+    new_node->previous = split_vec.back().get();
     new_node->link_at(0)->previous = new_node;
-
-    new_node->previous = previous_p;
-    new_node->previous->set_link(0, new_node);
 
     return std::make_pair(iterator(new_node), true);
   }
-
-  /*template <class P>
-  std::pair<iterator, bool> insert(P&& value) {
-    throw std::runtime_error("Unimplemented!");
-  }
-  */
 
   /**
    *
@@ -465,7 +454,34 @@ class skip_map {
   Allocator get_allocator() const { return allocator_; }
 
  private:
- 
+
+  /**
+   * Return lower bound of each level by key.
+   */
+  std::vector<iterator> splice(const Key& key){
+  
+    std::vector<iterator> lower_bounds;
+   
+    //Start at the top level and go down every level
+    iterator start(rend_,max_level_);
+    for(size_t i=0;i<=max_level_;++i){
+      
+      //Access the fist non terminal node on the level
+      auto temp = start;
+      
+      //Advance as far as we can without reaching the end or going over
+      while(temp+1 != end() && key_comparator_((temp+1)->first, key)){
+        ++temp;
+      }
+    
+      lower_bounds.emplace_back(temp);
+     
+      start.go_down();
+    }
+  
+    return lower_bounds;
+  }
+  
   /**
    * Return lower bound of each level by key.
    */

@@ -98,9 +98,9 @@ class skip_map_iterator
   friend class ConstructedTest;
   FRIEND_TEST(ConstructedTest, splice);
 
+  size_t level_;
 private :
   node_pointer_type node;
-  size_t level_;
 };
 
 #endif /* skip_map_iterator_h */
