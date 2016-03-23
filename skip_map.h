@@ -50,7 +50,9 @@ class skip_map {
     max_level_(0)
   {
     end_->previous = rend_;
-    rend_->set_link(0, end_);
+    for(size_t i=0;i<skip_list_size_k;++i){
+      rend_->set_link(i, end_);
+    }
   }
   
   /**
@@ -268,12 +270,16 @@ class skip_map {
       return std::make_pair(current, false);
     }
     
+    //TODO : Randomly choose a level for the new node
+    size_t node_level = 3;
+    if(node_level > max_level_){
+      max_level_ =  node_level;
+    }
+    
     // Create new node
     auto new_node = allocate_and_init(value.first, value.second);
     auto split_vec = splice(value.first);
     for(auto it : split_vec ){
-      //TODO : Deduplicate code in versions of splice()
-      //TODO : Choose a level for the new node
       new_node->set_link(it.level_, (it+1).get());
       it.get()->set_link(it.level_,new_node);
     }
@@ -459,31 +465,22 @@ class skip_map {
    * Return lower bound of each level by key.
    */
   std::vector<iterator> splice(const Key& key){
-  
-    std::vector<iterator> lower_bounds;
+ 
+    //First get the const_iterators by invoking the const version of splice
+    const skip_map& const_this = static_cast<const skip_map &>(*this);
+    std::vector<const_iterator> const_lower_bounds = const_this.splice(key);
    
-    //Start at the top level and go down every level
-    iterator start(rend_,max_level_);
-    for(size_t i=0;i<=max_level_;++i){
-      
-      //Access the fist non terminal node on the level
-      auto temp = start;
-      
-      //Advance as far as we can without reaching the end or going over
-      while(temp+1 != end() && key_comparator_((temp+1)->first, key)){
-        ++temp;
-      }
-    
-      lower_bounds.emplace_back(temp);
-     
-      start.go_down();
+    //Convert const iterators into iterators
+    std::vector<iterator> lower_bounds;
+    for(auto const_bound : const_lower_bounds){
+      lower_bounds.emplace_back(const_cast<node_type*>(const_bound.get()),const_bound.level_);
     }
   
     return lower_bounds;
   }
   
   /**
-   * Return lower bound of each level by key.
+   * const overload of splice()
    */
   std::vector<const_iterator> splice(const Key& key) const{
   

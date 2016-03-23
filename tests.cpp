@@ -164,7 +164,7 @@ TEST_F(SkipMapTest, all_lookup_techniques_mixed_data){
   techniques.emplace_back([&sm, &map](int key){return std::make_pair(sm.upper_bound(key), map.upper_bound(key));});
   techniques.emplace_back([&sm, &map](int key){return std::make_pair(sm.find(key), map.find(key));});
 
-  // Go over each techniqu
+  // Go over each technique
   for( auto technique : techniques){
     //Test for each value of the data
     for(auto key_value: data){
