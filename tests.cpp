@@ -204,13 +204,6 @@ TEST_F(SkipMapTest, iterate) {
     ASSERT_EQ(sm_it->first, map_it->first);
     ASSERT_EQ(sm_it->second, map_it->second);
   }
-
-  auto sm_rit = sm.crbegin();
-  auto map_rit = map.crbegin();
-  for (; sm_rit != sm.crend(); ++sm_rit, ++map_rit) {
-    ASSERT_EQ(sm_rit->first, map_rit->first);
-    ASSERT_EQ(sm_rit->second, map_rit->second);
-  }
 }
 
 TEST_F(SkipMapTest,insert_with_operator){

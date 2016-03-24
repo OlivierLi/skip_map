@@ -183,44 +183,6 @@ class skip_map {
   const_iterator cend() const noexcept { return end(); }
 
   /**
-   * Returns a reverse iterator to the first element of the reversed container.
-   * It corresponds to the last element of the non-reversed container.
-   */
-  reverse_iterator rbegin() noexcept { return reverse_iterator(end()); }
-
-  /**
-   * const overload of rbegin()
-   */
-  const_reverse_iterator rbegin() const noexcept {
-    return const_reverse_iterator(end());
-  }
-
-  /**
-   * explicitally const verstion of begin()
-   */
-  const_reverse_iterator crbegin() const noexcept { return rbegin(); }
-
-  /**
-   * Returns a reverse iterator to the element following the last element of
-   * the reversed container. It corresponds to the element preceding the first
-   * element of the non-reversed container. This element acts as a placeholder,
-   * attempting to access it results in undefined behavior.
-   */
-  reverse_iterator rend() noexcept { return reverse_iterator(begin()); }
-
-  /**
-   * const overload of rend()
-   */
-  const_reverse_iterator rend() const noexcept {
-    return const_reverse_iterator(begin());
-  }
-
-  /**
-   * explicitally const version of rend()
-   */
-  const_reverse_iterator crend() const noexcept { return rend(); }
-
-  /**
    * Checks if the container has no elements
    */
   bool empty() const noexcept { return begin() == end(); }

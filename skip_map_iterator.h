@@ -8,7 +8,7 @@ template <typename Key, typename Value, bool is_const,
               is_const, const std::pair<const Key, Value>,
               std::pair<const Key, Value>>::type>
 class skip_map_iterator
-    : public std::iterator<std::bidirectional_iterator_tag, value_type> {
+    : public std::iterator<std::forward_iterator_tag, value_type> {
  public:
   using difference_type = ptrdiff_t;
   using node_pointer_type =
@@ -16,9 +16,9 @@ class skip_map_iterator
                                 skip_map_node<Key, Value>*>::type;
 
   skip_map_iterator(skip_map_node<Key, Value>* p, size_t level = 0)
-      : node(p), level_(level) {}
+      :level_(level), node(p) {}
   skip_map_iterator(const skip_map_iterator<Key, Value, false>& other)
-      : node(other.node), level_(other.level_) {}
+      : level_(other.level_), node(other.node) {}
 
   skip_map_iterator& operator++() {
     // Do not iterate into nullptr
@@ -33,43 +33,16 @@ class skip_map_iterator
     return tmp;
   }
 
-  skip_map_iterator& operator--() {
-    // Do not iterate into nullptr
-    if(node->previous){
-      node = node->previous;
-    }
-    return *this;
-  }
-  skip_map_iterator operator--(int) {
-    skip_map_iterator tmp(*this);
-    operator--();
-    return tmp;
-  }
-
   skip_map_iterator operator+(difference_type n) const {
     skip_map_iterator temp(*this);
-    for (size_t i = 0; temp.node && i < n; ++i) {
-      ++temp;
-    }
-    return temp;
-  }
-
-  skip_map_iterator operator-(difference_type n) const {
-    skip_map_iterator temp(*this);
     for (difference_type i = 0; temp.node && i < n; ++i) {
-      --temp;
+      ++temp;
     }
     return temp;
   }
 
   skip_map_iterator& operator+=(difference_type n) {
     skip_map_iterator temp = this->operator+(n);
-    *this = temp;
-    return *this;
-  }
-
-  skip_map_iterator& operator-=(difference_type n) {
-    skip_map_iterator temp = this->operator-(n);
     *this = temp;
     return *this;
   }
