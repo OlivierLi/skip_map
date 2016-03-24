@@ -49,7 +49,6 @@ class skip_map {
     rend_(allocate_and_init()),
     max_level_(0)
   {
-    end_->previous = rend_;
     for(size_t i=0;i<skip_list_size_k;++i){
       rend_->set_link(i, end_);
     }
@@ -245,8 +244,6 @@ class skip_map {
       new_node->set_link(it.level_, (it+1).get());
       it.get()->set_link(it.level_,new_node);
     }
-    new_node->previous = split_vec.back().get();
-    new_node->link_at(0)->previous = new_node;
 
     return std::make_pair(iterator(new_node), true);
   }
@@ -307,15 +304,15 @@ class skip_map {
       return end();
     }
     
-    node_type* next = pos.get()->link_at(0);
-    node_type* previous = pos.get()->previous;
+    //node_type* next = pos.get()->link_at(0);
+    //node_type* previous = pos.get()->previous;
     
-    previous->set_link(0,next);
-    next->previous =  previous;
+    //previous->set_link(0,next);
+    //next->previous =  previous;
     
-    destroy_and_release(pos.get());
+    //destroy_and_release(pos.get());
     
-    return iterator(next);
+    return end();
   }
 
   /**

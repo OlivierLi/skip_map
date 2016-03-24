@@ -19,13 +19,13 @@ class skip_map_node {
   /**
    * The default constructor, only initilializes member variables
    */
-  skip_map_node() : links{nullptr}, previous{nullptr}, entry{Key(), T()} {}
+  skip_map_node() : links{nullptr}, entry{Key(), T()} {}
 
   /**
    * Constructor, sets the the entry member using the provided values.
    */
   skip_map_node(Key key, T value)
-      : links{nullptr}, previous{nullptr}, entry{key, value} {}
+      : links{nullptr}, entry{key, value} {}
 
   /**
    * Accessor to get the link pointer at the desired index.
@@ -47,13 +47,6 @@ class skip_map_node {
     assert(i <= skip_list_size_k - 1);
     links[i] = link;
   }
-
-  /**
-   * A link to the previous node in the list. Provided so that the data
-   * structures built on top of these nodes can be iterated over in reverse
-   * order.
-   */
-  skip_map_node* previous;
 
   /**
    * The value contained within the node.
