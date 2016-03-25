@@ -10,7 +10,7 @@ template <typename Key, typename Value, bool is_const,
 class skip_map_iterator
     : public std::iterator<std::forward_iterator_tag, value_type> {
  public:
-  using difference_type = ptrdiff_t;
+  using difference_type = std::ptrdiff_t;
   using node_pointer_type =
       typename std::conditional<is_const, const skip_map_node<Key, Value>*,
                                 skip_map_node<Key, Value>*>::type;
