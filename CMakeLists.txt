@@ -6,9 +6,9 @@ SET(CLANG_COMPILE_FLAGS "-Wall -Wextra -Wfatal-errors --std=c++14 -g")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CLANG_COMPILE_FLAGS}" )
 
 #Find all cpp files recursively
-file(GLOB_RECURSE SRC "src" "*.cpp")
+set(SOURCES tests.cpp)
 
-add_executable(skip_map ${SRC})
+add_executable(skip_map ${SOURCES})
 
 find_package(GTest REQUIRED)
 find_package (Threads)
