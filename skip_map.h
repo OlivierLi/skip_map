@@ -71,7 +71,8 @@ class skip_map {
    */
   skip_map(skip_map&& rhs):
     rend_(rhs.rend_),
-    end_(rhs.end_)
+    end_(rhs.end_),
+    max_level_(rhs.max_level_)
   {
     rhs.rend_ = nullptr;
     rhs.end_ = nullptr;
@@ -303,16 +304,16 @@ class skip_map {
     if(pos==iterator(rend_) || pos==end()){
       return end();
     }
-    
-    //node_type* next = pos.get()->link_at(0);
-    //node_type* previous = pos.get()->previous;
-    
-    //previous->set_link(0,next);
-    //next->previous =  previous;
-    
-    //destroy_and_release(pos.get());
-    
-    return end();
+
+    //Set all previous links to skip the node we are about to delete
+    auto splice_vec = splice(pos->first);
+    for(auto it : splice_vec){
+      it.get()->set_link(it.level_,(it+2).get());
+    }
+
+    destroy_and_release(pos.get());
+
+    return splice_vec.back()+1;
   }
 
   /**

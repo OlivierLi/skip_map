@@ -315,7 +315,7 @@ TEST_F(SkipMapTest, clear){
 }
 
 TEST_F(SkipMapTest, erase){
-  auto& data =  mixed_data;
+  auto& data = mixed_data;
   auto map_pair = create_identical_maps(data);
   
   auto& sm = map_pair.first;

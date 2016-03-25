@@ -33,7 +33,9 @@ class skip_map_node {
    * skip_list_size_k-1 inclusively.
    */
   skip_map_node* link_at(size_t i) const {
-    assert(i <= skip_list_size_k - 1);
+    if(i > skip_list_size_k - 1){
+       throw std::runtime_error("Level too high");
+    }
     return links[i];
   }
 
@@ -44,7 +46,9 @@ class skip_map_node {
    * @param[in] link The new value for the pointer.
    */
   void set_link(size_t i, skip_map_node* link) {
-    assert(i <= skip_list_size_k - 1);
+    if(i > skip_list_size_k - 1){
+      throw std::runtime_error("Level too high");
+    }
     links[i] = link;
   }
 
