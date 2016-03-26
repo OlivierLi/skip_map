@@ -119,7 +119,7 @@ TEST_F(ConstructedTest, splice){
  
   // Empty map means 17 would be inserted on level 17 just after rend_
   splice = empty.splice(17);
-  ASSERT_EQ(splice.size(),1);
+  ASSERT_EQ(splice.size(),size_t(1));
   auto rend = skip_map<int, std::string>::iterator(empty.rend_);
   ASSERT_EQ(splice[0], rend );
   
@@ -208,9 +208,9 @@ TEST_F(SkipMapTest, iterate) {
 
 TEST_F(SkipMapTest,insert_with_operator){
   empty_skip_map[0];
-  ASSERT_EQ(empty_skip_map.size(), 1);
+  ASSERT_EQ(empty_skip_map.size(), size_t(1));
   empty_skip_map[0] = "Test";
-  ASSERT_EQ(empty_skip_map.size(), 1);
+  ASSERT_EQ(empty_skip_map.size(), size_t(1));
   ASSERT_EQ(empty_skip_map[0], "Test");
 }
 
@@ -311,7 +311,7 @@ TEST_F(SkipMapTest, clear){
   sm.clear();
   
   ASSERT_TRUE(sm.empty());
-  ASSERT_EQ(sm.size(),0);
+  ASSERT_EQ(sm.size(),size_t(0));
 }
 
 TEST_F(SkipMapTest, erase){

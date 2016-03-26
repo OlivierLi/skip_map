@@ -45,8 +45,8 @@ class skip_map {
    * Default constructor
    */
   skip_map():
-    end_ (allocate_and_init()),
     rend_(allocate_and_init()),
+    end_ (allocate_and_init()),
     max_level_(0)
   {
     for(size_t i=0;i<skip_list_size_k;++i){
@@ -492,18 +492,18 @@ class skip_map {
    * nodes
    */
   Allocator allocator_;
-  
-  /**
-   * Pointer to the element following the last element.
-   */
-  node_type* end_;
 
   /**
    * Pointer to the element preceding the first element.
    */
   node_type* rend_;
- 
-  size_type max_level_;
+
+  /**
+   * Pointer to the element following the last element.
+   */
+  node_type* end_;
+
+    size_type max_level_;
  
   /**
    * Instance of Compare used to compare keys
