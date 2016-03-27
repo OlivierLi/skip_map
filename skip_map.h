@@ -45,8 +45,8 @@ class skip_map {
    * Default constructor
    */
   skip_map():
-    rend_(allocate_and_init()),
     end_ (allocate_and_init()),
+    rend_(allocate_and_init()),
     max_level_(0)
   {
     for(size_t i=0;i<skip_list_size_k;++i){
