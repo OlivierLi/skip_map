@@ -4,51 +4,6 @@
 #include "skip_map.h"
 #include "gtest/gtest.h"
 
-/**
- * This test fixture provides a hand constructed instance of skip_map.
- * The goal of this is to ensure that the operations owrk on valid instance
- * and not only returns the right result but operates in the correct number
- * of steps
- */
-class ConstructedTest : public ::testing::Test {
-protected:
-
-  ConstructedTest(){
-    
-    //Start by normally adding the values
-    for(auto i : ordered_keys){
-      sm.insert({i,std::to_string(i)});
-    }
-   
-    //Set the forward links manually
-    sm.rend_->set_link(1, sm.find(6).node);
-    sm.rend_->set_link(2, sm.find(6).node);
-    sm.rend_->set_link(3, sm.find(6).node);
-   
-    sm.find(6).node->set_link(1, sm.find(9).node);
-    sm.find(6).node->set_link(2, sm.find(25).node);
-    sm.find(6).node->set_link(3, sm.end_);
-    
-    sm.find(9).node->set_link(1, sm.find(17).node);
-    
-    sm.find(17).node->set_link(1, sm.find(25).node);
-    
-    sm.find(25).node->set_link(1, sm.end_);
-    sm.find(25).node->set_link(2, sm.end_);
-    
-    sm.max_level_ = 3;
-    
-  }
-  
-  virtual ~ConstructedTest(){
-  }
- 
-  std::vector<int> ordered_keys{3,6,7,9,12,17,19,21,25,26};
-  skip_map<int, std::string> sm;
-  skip_map<int, std::string> empty;
-};
-
-
 class SkipMapTest : public ::testing::Test {
 protected:
 
@@ -84,57 +39,6 @@ protected:
     {5, "fraise"}, {4, "citron"}, {2, "carotte"}, {2, "carotte"},
     {1, "patate"}, {3, "lime"}, {6, "navet"}, {0, "laitue"}};
 };
-
-TEST_F(ConstructedTest, iterate){
-  // First of all make sure that all data was inserted correctly
-  for(auto key : ordered_keys){
-    ASSERT_EQ(sm.find(key)->first,key);
-    ASSERT_EQ(sm.find(key)->second,std::to_string(key));
-  }
-  
-  //Then we verify that the iterator go over the skip_list in the correct way
-  using iterator = skip_map<int, std::string>::iterator;
- 
-  //Test top level
-  iterator it(sm.rend_,3);
-  ASSERT_EQ((it+1),sm.find(6));
-  ASSERT_EQ((it+2),sm.end());
- 
-  //Go down and test lower level
-  it.go_down();
-  ASSERT_EQ((it+1),sm.find(6));
-  ASSERT_EQ((it+2),sm.find(25));
-  ASSERT_EQ((it+3),sm.end());
-  
-  it.go_down();
-  ASSERT_EQ((it+1),sm.find(6));
-  ASSERT_EQ((it+2),sm.find(9));
-  ASSERT_EQ((it+3),sm.find(17));
-  ASSERT_EQ((it+4),sm.find(25));
-  ASSERT_EQ((it+5),sm.end());
-}
-
-TEST_F(ConstructedTest, splice){
-  std::vector<skip_map<int, std::string>::iterator> splice;
- 
-  // Empty map means 17 would be inserted on level 17 just after rend_
-  splice = empty.splice(17);
-  ASSERT_EQ(splice.size(),size_t(1));
-  auto rend = skip_map<int, std::string>::iterator(empty.rend_);
-  ASSERT_EQ(splice[0], rend );
-  
-  splice = sm.splice(17);
-  ASSERT_EQ(splice.size(), sm.max_level_+1);
-  bool equal = splice[0].node == sm.find(6).node;
-  ASSERT_TRUE(equal);
-  equal = splice[1].node == sm.find(6).node;
-  ASSERT_TRUE(equal);
-  equal = splice[2].node == sm.find(9).node;
-  ASSERT_TRUE(equal);
-  equal = splice[3].node == sm.find(12).node;
-  ASSERT_TRUE(equal);
-
-}
 
 TEST_F(SkipMapTest, size_when_empty){
   ASSERT_EQ(empty_skip_map.size(), empty_map.size());

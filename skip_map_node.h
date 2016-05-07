@@ -6,8 +6,6 @@
 #include <array>
 #include <cassert>
 
-const size_t skip_list_size_k = 4;
-
 /**
  * The class that represents a node in the skip list. This class provides the
  * data representation but no logic. The logic is to be implemented in the

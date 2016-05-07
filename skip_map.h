@@ -6,6 +6,7 @@
 #include <vector>
 #include <exception>
 #include <functional>
+#include <random>
 #include "skip_map_node.h"
 #include "skip_map_iterator.h"
 #include <gtest/gtest_prod.h>
@@ -49,9 +50,7 @@ class skip_map {
     rend_(allocate_and_init()),
     max_level_(0)
   {
-    for(size_t i=0;i<skip_list_size_k;++i){
-      rend_->set_link(i, end_);
-    }
+    rend_->set_link(0, end_);
   }
   
   /**
@@ -233,8 +232,17 @@ class skip_map {
     }
     
     //TODO : Randomly choose a level for the new node
-    size_t node_level = 3;
+    size_t node_level = gen();
+
+    //Handle the case where the new node increase the max level
     if(node_level > max_level_){
+
+      //Add the necessary links to rend_
+      for(size_t i=max_level_;i<=node_level;++i){
+        rend_->set_link(i,end_);
+      }
+
+      //Increase the max level
       max_level_ =  node_level;
     }
     
@@ -509,6 +517,11 @@ class skip_map {
    * Instance of Compare used to compare keys
    */
   key_compare key_comparator_;
+
+  /**
+    * Random number generator that determins the level of an inserted node
+    */
+  std::function<int()> gen = std::bind(std::uniform_int_distribution<>{0,4},std::default_random_engine{});
   
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;
