@@ -11,7 +11,7 @@ SET(CXX_COMPILE_FLAGS "-Wall -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}" )
 
 #Find all cpp files recursively
-set(SOURCES tests.cpp)
+set(SOURCES src/tests.cpp)
 
 add_executable(skip_map ${SOURCES})
 

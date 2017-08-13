@@ -204,7 +204,7 @@ class skip_map {
   
     // If we have a null first pointer it's because the contents were moved out
     // There is no destruction or dealocating to do
-    if(rend_ == nullptr){
+    if(!rend_){
       return;
     }
   
@@ -214,10 +214,7 @@ class skip_map {
     }
  
     //Remove the nodes one by one until we are left with the end
-    auto it=begin();
-    while(it!=end()){
-      it = erase(it);
-    }
+    for(auto it=begin;it!=end();it=erase(it));
   }
 
   /**
