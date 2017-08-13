@@ -5,6 +5,7 @@
 #include <array>
 #include <vector>
 #include <exception>
+#include <stdexcept>
 #include <functional>
 #include <random>
 #include "skip_map_node.h"
@@ -46,8 +47,8 @@ class skip_map {
    * Default constructor
    */
   skip_map():
-    end_ (allocate_and_init()),
     rend_(allocate_and_init()),
+    end_ (allocate_and_init()),
     max_level_(0)
   {
     rend_->set_link(0, end_);
@@ -98,15 +99,29 @@ class skip_map {
   }
 
   /**
-   *
+   * Returns a reference to the mapped value of the element with key equivalent to key.
    */
-  T& at(const Key& key) { throw std::runtime_error("Unimplemented!"); }
+  T& at(const Key& key) { 
+
+      auto it = find(key);
+
+      if(it != end()){
+        return it->second;
+      }
+      else{
+        throw std::out_of_range("Key not found!"); 
+      }
+  }
 
   /**
-   *
+   * const overload of at()
    */
   const T& at(const Key& key) const {
-    throw std::runtime_error("Unimplemented!");
+      return const_this().at(key);
+  }
+
+  const skip_map& const_this(){
+    return static_cast<const skip_map &>(*this);
   }
   
   /**
@@ -115,8 +130,7 @@ class skip_map {
    * have to come from a non-const object (Effective c++ item 3)
    */
   iterator find(const Key& key) {
-    const skip_map& const_this = static_cast<const skip_map &>(*this);
-    const_iterator it = const_this.find(key);
+    const_iterator it = const_this().find(key);
     node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
@@ -214,7 +228,7 @@ class skip_map {
     }
  
     //Remove the nodes one by one until we are left with the end
-    for(auto it=begin;it!=end();it=erase(it));
+    for(auto it=begin();it!=end();it=erase(it));
   }
 
   /**
@@ -240,7 +254,7 @@ class skip_map {
       }
 
       //Increase the max level
-      max_level_ =  node_level;
+      max_level_ = node_level;
     }
     
     // Create new node
@@ -257,14 +271,14 @@ class skip_map {
   /**
    *
    */
-  iterator insert(const_iterator hint, const value_type& value) {
+  iterator insert(const_iterator /*hint*/, const value_type& /*value*/) {
     throw std::runtime_error("Unimplemented!");
   }
 
   /**
    *
    */
-  iterator insert(const_iterator hint, value_type&& value) {
+  iterator insert(const_iterator /*hint*/, value_type&& /*value*/) {
     throw std::runtime_error("Unimplemented!");
   }
 
@@ -272,7 +286,7 @@ class skip_map {
    *
    */
   template <class InputIt>
-  void insert(InputIt first, InputIt last) {
+  void insert(InputIt /*first*/, InputIt /*last*/) {
     //TODO : Implement with hint to avoid n*log(n) complexity
     throw std::runtime_error("Unimplemented!");
   }
@@ -280,7 +294,7 @@ class skip_map {
   /**
    *
    */
-  void insert(std::initializer_list<value_type> ilist) {
+  void insert(std::initializer_list<value_type> /*ilist*/) {
     //TODO : Implement with hint to avoid n*log(n) complexity
     throw std::runtime_error("Unimplemented!");
   }
@@ -289,7 +303,7 @@ class skip_map {
    *
    */
   template <class... Args>
-  std::pair<iterator, bool> emplace(Args&&... args) {
+  std::pair<iterator, bool> emplace(Args&&... /*args*/) {
     throw std::runtime_error("Unimplemented!");
   }
 
@@ -297,12 +311,12 @@ class skip_map {
    *
    */
   template <class... Args>
-  iterator emplace_hint(const_iterator hint, Args&&... args) {
+  iterator emplace_hint(const_iterator /*hint*/, Args&&... /*args*/) {
     throw std::runtime_error("Unimplemented!");
   }
 
   /**
-   *
+   * Removes specified elements from the container.
    */
   iterator erase(iterator pos) {
     //Don't delete past the end, past the beginning nodes
@@ -324,7 +338,7 @@ class skip_map {
   /**
    *
    */
-  void erase(iterator first, iterator last) {
+  void erase(iterator /*first*/, iterator /*last*/) {
     throw std::runtime_error("Unimplemented!");
   }
 
@@ -380,8 +394,7 @@ class skip_map {
    * have to come from a non-const object (Effective c++ item 3)
    */
   iterator lower_bound(const Key& key) {
-    const skip_map& const_this = static_cast<const skip_map &>(*this);
-    const_iterator it = const_this.lower_bound(key);
+    const_iterator it = const_this().lower_bound(key);
     node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
@@ -400,8 +413,7 @@ class skip_map {
    * have to come from a non-const object (Effective c++ item 3)
    */
   iterator upper_bound(const Key& key) {
-    const skip_map& const_this = static_cast<const skip_map &>(*this);
-    const_iterator it = const_this.upper_bound(key);
+    const_iterator it = const_this().upper_bound(key);
     node_type* ptr = const_cast<node_type*>(it.get());
     return iterator(ptr);
   }
@@ -507,8 +519,11 @@ class skip_map {
    * Pointer to the element following the last element.
    */
   node_type* end_;
-
-    size_type max_level_;
+    
+  /**
+   * The current highest level of any node
+   */
+  size_type max_level_;
  
   /**
    * Instance of Compare used to compare keys
@@ -563,8 +578,8 @@ bool operator!=(const skip_map<Key, T, Compare, Alloc>& lhs,
  *
  */
 template <class Key, class T, class Compare, class Alloc>
-bool operator<(const skip_map<Key, T, Compare, Alloc>& lhs,
-               const skip_map<Key, T, Compare, Alloc>& rhs) {
+bool operator<(const skip_map<Key, T, Compare, Alloc>& /*lhs*/,
+               const skip_map<Key, T, Compare, Alloc>& /*rhs*/) {
   throw std::runtime_error("Unimplemented!");
 }
 
@@ -572,8 +587,8 @@ bool operator<(const skip_map<Key, T, Compare, Alloc>& lhs,
  *
  */
 template <class Key, class T, class Compare, class Alloc>
-bool operator<=(const skip_map<Key, T, Compare, Alloc>& lhs,
-                const skip_map<Key, T, Compare, Alloc>& rhs) {
+bool operator<=(const skip_map<Key, T, Compare, Alloc>& /*lhs*/,
+                const skip_map<Key, T, Compare, Alloc>& /*rhs*/) {
   throw std::runtime_error("Unimplemented!");
 }
 
@@ -581,8 +596,8 @@ bool operator<=(const skip_map<Key, T, Compare, Alloc>& lhs,
  *
  */
 template <class Key, class T, class Compare, class Alloc>
-bool operator>(const skip_map<Key, T, Compare, Alloc>& lhs,
-               const skip_map<Key, T, Compare, Alloc>& rhs) {
+bool operator>(const skip_map<Key, T, Compare, Alloc>& /*lhs*/,
+               const skip_map<Key, T, Compare, Alloc>& /*rhs*/) {
   throw std::runtime_error("Unimplemented!");
 }
 
@@ -590,8 +605,8 @@ bool operator>(const skip_map<Key, T, Compare, Alloc>& lhs,
  *
  */
 template <class Key, class T, class Compare, class Alloc>
-bool operator>=(const skip_map<Key, T, Compare, Alloc>& lhs,
-                const skip_map<Key, T, Compare, Alloc>& rhs) {
+bool operator>=(const skip_map<Key, T, Compare, Alloc>& /*lhs*/,
+                const skip_map<Key, T, Compare, Alloc>& /*rhs*/) {
   throw std::runtime_error("Unimplemented!");
 }
 

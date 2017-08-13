@@ -51,9 +51,7 @@ TEST_F(SkipMapTest, lower_bound_empty_map){
 
 TEST_F(SkipMapTest, all_lookup_techniques_mixed_data){
   
-  auto& data =  mixed_data;
-  auto map_pair = create_identical_maps(data);
-  
+  auto map_pair = create_identical_maps(mixed_data);
   auto& sm = map_pair.first;
   auto& map = map_pair.second;
 
@@ -71,7 +69,7 @@ TEST_F(SkipMapTest, all_lookup_techniques_mixed_data){
   // Go over each technique
   for( auto technique : techniques){
     //Test for each value of the data
-    for(auto key_value: data){
+    for(auto key_value: mixed_data){
     
       auto it_pair = technique(key_value.first);
       auto& sm_it = it_pair.first;
@@ -97,8 +95,8 @@ TEST_F(SkipMapTest, all_lookup_techniques_mixed_data){
 
 TEST_F(SkipMapTest, iterate) {
   auto map_pair = create_identical_maps(mixed_data);
-  auto sm = map_pair.first;
-  auto map = map_pair.second;
+  auto& sm = map_pair.first;
+  auto& map = map_pair.second;
   
   ASSERT_EQ(sm.size(), map.size());
 
@@ -216,6 +214,16 @@ TEST_F(SkipMapTest, clear){
   
   ASSERT_TRUE(sm.empty());
   ASSERT_EQ(sm.size(),size_t(0));
+}
+
+TEST_F(SkipMapTest, at){
+  ASSERT_THROW(empty_skip_map.at(1), std::out_of_range);
+
+  auto map_pair = create_identical_maps(mixed_data);
+  auto& sm = map_pair.first;
+  auto& map = map_pair.second;
+    
+  ASSERT_EQ(sm.at(1), map.at(1));
 }
 
 TEST_F(SkipMapTest, erase){
