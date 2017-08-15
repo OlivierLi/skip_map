@@ -319,6 +319,7 @@ class skip_map {
    * Removes specified elements from the container.
    */
   iterator erase(iterator pos) {
+
     //Don't delete past the end, past the beginning nodes
     if(pos==iterator(rend_) || pos==end()){
       return end();

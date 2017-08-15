@@ -10,13 +10,17 @@ ENDIF()
 SET(CXX_COMPILE_FLAGS "-Wall -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}" )
 
-#Find all cpp files recursively
-set(SOURCES src/tests.cpp)
-
-add_executable(skip_map ${SOURCES})
+set(TEST_SOURCES src/tests.cpp)
+set(BENCH_SOURCES src/bench.cpp)
 
 find_package(GTest REQUIRED)
-find_package (Threads)
+find_package (Threads REQUIRED)
+find_package(benchmark REQUIRED)
 
-include_directories( ${GTEST_INCLUDE_DIRS} )
-target_link_libraries(skip_map ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
+include_directories(${benchmark_INCLUDE_DIR} ${GTEST_INCLUDE_DIRS} )
+
+add_executable(bench ${BENCH_SOURCES})
+target_link_libraries(bench benchmark)
+
+add_executable(tests ${TEST_SOURCES})
+target_link_libraries(tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )

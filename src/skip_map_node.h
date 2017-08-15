@@ -5,6 +5,7 @@
 #include <utility>
 #include <array>
 #include <cassert>
+#include "small_vector.hpp" 
 
 /**
  * The class that represents a node in the skip list. This class provides the
@@ -17,14 +18,14 @@ class skip_map_node {
   /**
    * The default constructor, only initilializes member variables
    */
-  skip_map_node() : entry{Key(), T()},links{nullptr} {}
+  skip_map_node() : entry{Key(), T()}, links{} {}
 
   /**
    * Constructor, sets the the entry member using the provided values.
    */
   skip_map_node(Key key, T value):
        entry{key, value},
-       links{nullptr}
+       links{}
   {}
 
   /**
@@ -33,7 +34,7 @@ class skip_map_node {
    * @param[in] i The index of the link.
    */
   skip_map_node* link_at(size_t i) const {
-    if(i > links.size()-1){
+    if(links.size() == 0 || i > links.size()-1){
       return nullptr;
     }
     return links[i];
