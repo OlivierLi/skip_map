@@ -7,7 +7,7 @@ ELSE()
     SET(CMAKE_CXX_COMPILER g++-5)
 ENDIF()
 
-SET(CXX_COMPILE_FLAGS "-Wall -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
+SET(CXX_COMPILE_FLAGS "-Wall -O3 -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}" )
 
 set(TEST_SOURCES src/tests.cpp)

@@ -158,6 +158,7 @@ class skip_map {
       return it->second;
     }
     else{
+      // TODO : Would std::map avoid allocating a string and then copying?
       return insert(value_type{key,T()}).first->second;
     }
   }
@@ -235,7 +236,7 @@ class skip_map {
    * Inserts element(s) into the container, if the container doesn't already 
    * contain an element with an equivalent key.
    */
-  std::pair<iterator, bool> insert(const value_type& value) {
+  std::pair<iterator, bool> insert(value_type value) {
     
     auto current = lower_bound(value.first);
     if (!key_comparator_(value.first,current->first) && current != end()) {
@@ -258,11 +259,11 @@ class skip_map {
     }
     
     // Create new node
-    auto new_node = allocate_and_init(value.first, value.second);
+    auto new_node = allocate_and_init(std::move(value.first), std::move(value.second));
     auto split_vec = splice(value.first);
     for(auto it : split_vec ){
       new_node->set_link(it.level_, (it+1).get());
-      it.get()->set_link(it.level_,new_node);
+      it.get()->set_link(it.level_, new_node);
     }
 
     return std::make_pair(iterator(new_node), true);
@@ -445,8 +446,7 @@ class skip_map {
   std::vector<iterator> splice(const Key& key){
  
     //First get the const_iterators by invoking the const version of splice
-    const skip_map& const_this = static_cast<const skip_map &>(*this);
-    std::vector<const_iterator> const_lower_bounds = const_this.splice(key);
+    std::vector<const_iterator> const_lower_bounds = const_this().splice(key);
    
     //Convert const iterators into iterators
     std::vector<iterator> lower_bounds;
@@ -465,7 +465,7 @@ class skip_map {
     std::vector<const_iterator> lower_bounds;
    
     //Start at the top level and go down every level
-    const_iterator start(rend_,max_level_);
+    const_iterator start(rend_, max_level_);
     for(size_t i=0;i<=max_level_;++i){
       
       //Access the fist non terminal node on the level
