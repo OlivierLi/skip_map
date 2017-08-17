@@ -5,7 +5,9 @@
 #include <utility>
 #include <array>
 #include <cassert>
-#include "small_vector.hpp" 
+#include "fixed_vector.hpp" 
+
+constexpr size_t MAX_SIZE{4};
 
 /**
  * The class that represents a node in the skip list. This class provides the
@@ -34,10 +36,11 @@ class skip_map_node {
    * @param[in] i The index of the link.
    */
   skip_map_node* link_at(size_t i) const {
-    if(links.size() == 0 || i > links.size()-1){
+    if(links.empty() || i > links.size()-1){
       return nullptr;
     }
-    return links[i];
+
+    return links.at(i);
   }
 
   /**
@@ -51,7 +54,7 @@ class skip_map_node {
       links.resize(i+1);
     }
 
-    links[i] = link;
+    links.at(i) = link;
   }
 
   /**
@@ -64,6 +67,7 @@ class skip_map_node {
    * The links used to go over the list. The link at index 0 is essentially the
    * same as the "next" pointer of a classic linked list.
    */
+  //static_assert(false, "Should be a managed array of size MAX_SIZE");
   std::vector<skip_map_node*> links;
 };
 

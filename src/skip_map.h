@@ -534,7 +534,7 @@ class skip_map {
   /**
     * Random number generator that determins the level of an inserted node
     */
-  std::function<int()> gen = std::bind(std::uniform_int_distribution<>{0,4},std::default_random_engine{});
+  std::function<int()> gen = std::bind(std::uniform_int_distribution<>{0, MAX_SIZE-1},std::default_random_engine{});
   
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;

@@ -7,14 +7,10 @@
 class SkipMapTest : public ::testing::Test {
 protected:
 
-  SkipMapTest(){
-  }
+  SkipMapTest() = default;
+  virtual ~SkipMapTest() = default;
   
-  virtual ~SkipMapTest(){
-  }
-  
-  std::pair<skip_map<int, std::string>,std::map<int, std::string>>
-  create_identical_maps(std::vector<std::pair<int,std::string>> data){
+  auto create_identical_maps(std::vector<std::pair<int,std::string>> data){
     
     skip_map<int, std::string> sm;
     std::map<int, std::string> map;
@@ -246,6 +242,38 @@ TEST_F(SkipMapTest, erase){
     }  
   }
   
+}
+
+//-----------------------------------------------------------------------------
+//array tests------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+class FixedVectorTest : public ::testing::Test {
+protected:
+  FixedVectorTest() = default;
+  virtual ~FixedVectorTest() = default;
+  fixed_vector<int, 10> data;
+};
+
+TEST_F(FixedVectorTest, empty){
+  ASSERT_TRUE(data.empty());
+  ASSERT_EQ(data.size(), 0);
+  ASSERT_THROW(data.at(1), std::out_of_range);
+}
+
+TEST_F(FixedVectorTest, push_back){
+  size_t i=0;
+  for(;i<data.capacity();++i){
+    ASSERT_FALSE(data.full());
+    ASSERT_EQ(data.size(), i);
+    data.push_back(i);
+    ASSERT_EQ(data.at(i), i);
+    ASSERT_EQ(data.size(), i+1);
+  }
+
+  // Done filling, no place anymore
+  ASSERT_THROW(data.at(i), std::out_of_range);
+  ASSERT_TRUE(data.full());
 }
 
 int main(int argc, char **argv) {
