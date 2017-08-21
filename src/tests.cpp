@@ -259,6 +259,7 @@ TEST_F(FixedVectorTest, empty){
   ASSERT_TRUE(data.empty());
   ASSERT_EQ(data.size(), 0);
   ASSERT_THROW(data.at(1), std::out_of_range);
+  ASSERT_EQ(std::distance(data.begin(), data.end()), 0);
 }
 
 TEST_F(FixedVectorTest, push_back){
@@ -266,14 +267,27 @@ TEST_F(FixedVectorTest, push_back){
   for(;i<data.capacity();++i){
     ASSERT_FALSE(data.full());
     ASSERT_EQ(data.size(), i);
+    ASSERT_EQ(std::distance(data.begin(), data.end()), i);
     data.push_back(i);
     ASSERT_EQ(data.at(i), i);
     ASSERT_EQ(data.size(), i+1);
+    ASSERT_EQ(data.back(), i);
+    ASSERT_EQ(std::distance(data.begin(), data.end()), i+1);
   }
 
   // Done filling, no place anymore
   ASSERT_THROW(data.at(i), std::out_of_range);
   ASSERT_TRUE(data.full());
+  ASSERT_EQ(std::distance(data.begin(), data.end()), 10);
+
+  // Let's try resizing
+  data.resize(10); // No effect
+  ASSERT_EQ(data.size(), 10);
+  ASSERT_EQ(data.at(9), 9);
+
+  data.resize(5);
+  ASSERT_EQ(data.size(), 5);
+  ASSERT_FALSE(data.full());
 }
 
 int main(int argc, char **argv) {

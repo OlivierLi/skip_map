@@ -67,8 +67,7 @@ class skip_map_node {
    * The links used to go over the list. The link at index 0 is essentially the
    * same as the "next" pointer of a classic linked list.
    */
-  //static_assert(false, "Should be a managed array of size MAX_SIZE");
-  std::vector<skip_map_node*> links;
+  fixed_vector<skip_map_node*, MAX_SIZE> links;
 };
 
 #endif /* skip_map_node_h */

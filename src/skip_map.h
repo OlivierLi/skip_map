@@ -3,7 +3,6 @@
 
 #include <limits>
 #include <array>
-#include <vector>
 #include <exception>
 #include <stdexcept>
 #include <functional>
@@ -38,8 +37,9 @@ class skip_map {
 
   using iterator = skip_map_iterator<Key, T, false>;
   using const_iterator = skip_map_iterator<Key, T, true>;
-  using reverse_iterator = std::reverse_iterator<iterator>;
-  using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+  using splice_t = fixed_vector<iterator, MAX_SIZE>;
+  using const_splice_t = fixed_vector<const_iterator, MAX_SIZE>;
 
   using node_type = skip_map_node<Key, T>;
   
@@ -260,8 +260,8 @@ class skip_map {
     
     // Create new node
     auto new_node = allocate_and_init(std::move(value.first), std::move(value.second));
-    auto split_vec = splice(value.first);
-    for(auto it : split_vec ){
+    const auto& splice_vec = splice(value.first);
+    for(auto it : splice_vec ){
       new_node->set_link(it.level_, (it+1).get());
       it.get()->set_link(it.level_, new_node);
     }
@@ -327,8 +327,8 @@ class skip_map {
     }
 
     //Set all previous links to skip the node we are about to delete
-    auto splice_vec = splice(pos->first);
-    for(auto it : splice_vec){
+    const auto& splice_vec = splice(pos->first);
+    for(const auto& it : splice_vec){
       it.get()->set_link(it.level_,(it+2).get());
     }
 
@@ -405,7 +405,7 @@ class skip_map {
    * const overload of lower_bound()
    */
   const_iterator lower_bound(const Key& key) const {
-    auto splice_vec =  splice(key);
+    const auto& splice_vec = splice(key);
     return splice_vec.back()+1;
   }
 
@@ -443,14 +443,14 @@ class skip_map {
   /**
    * Return lower bound of each level by key.
    */
-  std::vector<iterator> splice(const Key& key){
+  splice_t splice(const Key& key){
  
     //First get the const_iterators by invoking the const version of splice
-    std::vector<const_iterator> const_lower_bounds = const_this().splice(key);
+    const const_splice_t& const_lower_bounds = const_this().splice(key);
    
     //Convert const iterators into iterators
-    std::vector<iterator> lower_bounds;
-    for(auto const_bound : const_lower_bounds){
+    splice_t lower_bounds;
+    for(const auto& const_bound : const_lower_bounds){
       lower_bounds.emplace_back(const_cast<node_type*>(const_bound.get()),const_bound.level_);
     }
   
@@ -460,9 +460,9 @@ class skip_map {
   /**
    * const overload of splice()
    */
-  std::vector<const_iterator> splice(const Key& key) const{
+  const_splice_t splice(const Key& key) const{
   
-    std::vector<const_iterator> lower_bounds;
+    const_splice_t lower_bounds;
    
     //Start at the top level and go down every level
     const_iterator start(rend_, max_level_);

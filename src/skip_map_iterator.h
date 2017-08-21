@@ -15,6 +15,9 @@ class skip_map_iterator
       typename std::conditional<is_const, const skip_map_node<Key, Value>*,
                                 skip_map_node<Key, Value>*>::type;
 
+
+  skip_map_iterator():level_(0), node(nullptr) {}
+
   skip_map_iterator(skip_map_node<Key, Value>* p, size_t level = 0)
       :level_(level), node(p) {}
   skip_map_iterator(const skip_map_iterator<Key, Value, false>& other)
@@ -65,7 +68,7 @@ class skip_map_iterator
     ++level_;
   }
 
-  node_pointer_type get() { return node; }
+  node_pointer_type get() const { return node; }
 
   // Friend classes only for unit tests
   friend class ConstructedTest;
