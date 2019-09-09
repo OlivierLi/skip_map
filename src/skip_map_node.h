@@ -64,6 +64,7 @@ class skip_map_node {
    * same as the "next" pointer of a classic linked list.
    */
   fixed_vector<skip_map_node*, MAX_SIZE> links;
+  FRIEND_TEST(insert, case1);
 };
 
 #endif /* skip_map_node_h */

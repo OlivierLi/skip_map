@@ -2,6 +2,7 @@
 #define skip_map_iterator_h
 
 #include <gtest/gtest_prod.h>
+#include "skip_map_node.h"
 
 template <typename Key,
           typename Value,
@@ -77,6 +78,7 @@ class skip_map_iterator
 
  private:
   node_pointer_type node;
+  FRIEND_TEST(insert, case1);
 };
 
 #endif /* skip_map_iterator_h */

@@ -492,6 +492,10 @@ class skip_map {
     }
   }
 
+  void set_gen_for_testing(std::function<int()> func){
+    gen = func;
+  }
+
   /**
    * Private instance of the Allocator type used to allocate and initialize
    * nodes
@@ -529,7 +533,10 @@ class skip_map {
   friend class ConstructedTest;
   FRIEND_TEST(ConstructedTest, iterate);
   FRIEND_TEST(ConstructedTest, splice);
+
+  FRIEND_TEST(insert, case1);
 };
+
 
 /**
  * Checks if the contents of lhs and rhs are equal, that is, whether lhs.size()
