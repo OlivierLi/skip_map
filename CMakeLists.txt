@@ -1,26 +1,23 @@
 cmake_minimum_required(VERSION 2.8)
-project(skip_map)
+PROJECT(skip_map)
 
-IF(APPLE)
-    SET(CMAKE_CXX_COMPILER clang++)
-ELSE()
-    SET(CMAKE_CXX_COMPILER g++-5)
-ENDIF()
+SET(CMAKE_CXX_COMPILER clang++)
 
-SET(CXX_COMPILE_FLAGS "-Wall -O3 -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
+#TODO : No frame-pointer in release build
+SET(CXX_COMPILE_FLAGS "-Wall -pthread -O3 -fno-omit-frame-pointer -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}" )
 
-set(TEST_SOURCES src/tests.cpp)
-set(BENCH_SOURCES src/bench.cpp)
+SET(TEST_SOURCES src/tests.cpp)
+SET(BENCH_SOURCES src/bench.cpp)
 
-find_package(GTest REQUIRED)
-find_package (Threads REQUIRED)
-find_package(benchmark REQUIRED)
+FIND_PACKAGE(GTest REQUIRED)
+FIND_PACKAGE (Threads REQUIRED)
+FIND_PACKAGE(benchmark REQUIRED)
 
-include_directories(${benchmark_INCLUDE_DIR} ${GTEST_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES(${benchmark_INCLUDE_DIR} ${GTEST_INCLUDE_DIRS} )
 
-add_executable(bench ${BENCH_SOURCES})
-target_link_libraries(bench benchmark)
+ADD_EXECUTABLE(bench ${BENCH_SOURCES})
+TARGET_LINK_LIBRARIES(bench benchmark)
 
-add_executable(tests ${TEST_SOURCES})
-target_link_libraries(tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )
+ADD_EXECUTABLE(tests ${TEST_SOURCES})
+TARGET_LINK_LIBRARIES(tests ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} )

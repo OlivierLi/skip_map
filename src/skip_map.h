@@ -243,7 +243,6 @@ class skip_map {
       return std::make_pair(current, false);
     }
     
-    //TODO : Randomly choose a level for the new node
     size_t node_level = gen();
 
     //Handle the case where the new node increase the max level
@@ -477,6 +476,9 @@ class skip_map {
       }
     
       lower_bounds.emplace_back(temp);
+    
+      // The seach will start again from the last found node
+      start = temp;
      
       start.go_down();
     }
@@ -534,7 +536,7 @@ class skip_map {
   /**
     * Random number generator that determins the level of an inserted node
     */
-  std::function<int()> gen = std::bind(std::uniform_int_distribution<>{0, MAX_SIZE-1},std::default_random_engine{});
+  std::function<int()> gen = std::bind(std::uniform_int_distribution<>{1, MAX_SIZE-1},std::default_random_engine{});
   
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;

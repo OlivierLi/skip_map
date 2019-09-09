@@ -10,19 +10,15 @@ protected:
   SkipMapTest() = default;
   virtual ~SkipMapTest() = default;
   
-  auto create_identical_maps(std::vector<std::pair<int,std::string>> data){
+  auto create_identical_maps(const std::vector<std::pair<int,std::string>>& data){
     
     skip_map<int, std::string> sm;
     std::map<int, std::string> map;
     
-    auto insert_in_both = [&sm, &map](std::pair<int, std::string> element) {
-      //Insert into both maps, insuring the the insertions return the
-      //same success flag
-      ASSERT_EQ(sm.insert(element).second, map.insert(element).second);
-    };
-    
     for (auto key_value : data) {
-      insert_in_both(key_value);
+      if(sm.insert(key_value).second != map.insert(key_value).second){
+          std::cerr << "One of the insert successes mismatched! [" << key_value.first << ":" << key_value.second << "]" << std::endl;
+      }
     }
     
     return std::make_pair(sm, map);
@@ -224,8 +220,7 @@ TEST_F(SkipMapTest, at){
 }
 
 TEST_F(SkipMapTest, erase){
-  auto& data = mixed_data;
-  auto map_pair = create_identical_maps(data);
+  auto map_pair = create_identical_maps(mixed_data);
   
   auto& sm = map_pair.first;
   auto& map = map_pair.second;
