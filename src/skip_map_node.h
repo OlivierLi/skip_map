@@ -1,11 +1,11 @@
 #ifndef skip_map_node_h
 #define skip_map_node_h
 
-#include <memory>
-#include <utility>
 #include <array>
 #include <cassert>
-#include "fixed_vector.hpp" 
+#include <memory>
+#include <utility>
+#include "fixed_vector.hpp"
 
 constexpr size_t MAX_SIZE{4};
 
@@ -25,10 +25,7 @@ class skip_map_node {
   /**
    * Constructor, sets the the entry member using the provided values.
    */
-  skip_map_node(Key key, T value):
-       entry{key, value},
-       links{}
-  {}
+  skip_map_node(Key key, T value) : entry{key, value}, links{} {}
 
   /**
    * Accessor to get the link pointer at the desired index.
@@ -36,7 +33,7 @@ class skip_map_node {
    * @param[in] i The index of the link.
    */
   skip_map_node* link_at(size_t i) const {
-    if(links.empty() || i > links.size()-1){
+    if (links.empty() || i > links.size() - 1) {
       return nullptr;
     }
 
@@ -49,9 +46,8 @@ class skip_map_node {
    * @param[in] link The new value for the pointer.
    */
   void set_link(size_t i, skip_map_node* link) {
-
-    if(links.size()<i+1){
-      links.resize(i+1);
+    if (links.size() < i + 1) {
+      links.resize(i + 1);
     }
 
     links.at(i) = link;

@@ -3,29 +3,32 @@
 
 #include <gtest/gtest_prod.h>
 
-template <typename Key, typename Value, bool is_const,
-          typename value_type = typename std::conditional<
-              is_const, const std::pair<const Key, Value>,
-              std::pair<const Key, Value>>::type>
+template <typename Key,
+          typename Value,
+          bool is_const,
+          typename value_type =
+              typename std::conditional<is_const,
+                                        const std::pair<const Key, Value>,
+                                        std::pair<const Key, Value>>::type>
 class skip_map_iterator
     : public std::iterator<std::forward_iterator_tag, value_type> {
  public:
   using difference_type = std::ptrdiff_t;
   using node_pointer_type =
-      typename std::conditional<is_const, const skip_map_node<Key, Value>*,
+      typename std::conditional<is_const,
+                                const skip_map_node<Key, Value>*,
                                 skip_map_node<Key, Value>*>::type;
 
-
-  skip_map_iterator():level_(0), node(nullptr) {}
+  skip_map_iterator() : level_(0), node(nullptr) {}
 
   skip_map_iterator(skip_map_node<Key, Value>* p, size_t level = 0)
-      :level_(level), node(p) {}
+      : level_(level), node(p) {}
   skip_map_iterator(const skip_map_iterator<Key, Value, false>& other)
       : level_(other.level_), node(other.node) {}
 
   skip_map_iterator& operator++() {
     // Do not iterate into nullptr
-    if(node->link_at(level_)){
+    if (node->link_at(level_)) {
       node = node->link_at(level_);
     }
     return *this;
@@ -60,13 +63,9 @@ class skip_map_iterator
   value_type& operator*() { return node->entry; }
   value_type* operator->() { return &node->entry; }
 
-  void go_down() {
-    --level_;
-  }
+  void go_down() { --level_; }
 
-  void go_up() {
-    ++level_;
-  }
+  void go_up() { ++level_; }
 
   node_pointer_type get() const { return node; }
 
@@ -75,7 +74,8 @@ class skip_map_iterator
   FRIEND_TEST(ConstructedTest, splice);
 
   size_t level_;
-private :
+
+ private:
   node_pointer_type node;
 };
 
