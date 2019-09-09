@@ -6,6 +6,7 @@ SET(CMAKE_CXX_COMPILER clang++)
 #TODO : No frame-pointer in release build
 SET(CXX_COMPILE_FLAGS "-Wall -pthread -O3 -fno-omit-frame-pointer -Wextra -Wfatal-errors -pedantic --std=c++14 -g")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CXX_COMPILE_FLAGS}" )
+SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 SET(TEST_SOURCES src/tests.cpp)
 SET(BENCH_SOURCES src/bench.cpp)
