@@ -237,14 +237,15 @@ class skip_map {
 
     // Handle the case where the new node increase the max level
     if (node_level > max_level_) {
-      // Add the necessary links to rend_
-      for (size_t i = max_level_; i <= node_level; ++i) {
+      // Add the necessary links to rend_ without touching existing ones.
+      for (size_t i = max_level_+1; i <= node_level; ++i) {
         rend_->set_link(i, end_);
       }
 
       // Increase the max level
       max_level_ = node_level;
     }
+
 
     // Create new node
     auto new_node =
@@ -525,8 +526,9 @@ class skip_map {
   /**
    * Random number generator that determins the level of an inserted node
    */
+  size_t l = 0;
   std::function<int()> gen =
-      std::bind(std::uniform_int_distribution<>{1, MAX_SIZE - 1},
+      std::bind(std::uniform_int_distribution<>{0, MAX_SIZE - 1},
                 std::default_random_engine{});
 
   // Define friend classes only for unit testing purposes
@@ -534,7 +536,7 @@ class skip_map {
   FRIEND_TEST(ConstructedTest, iterate);
   FRIEND_TEST(ConstructedTest, splice);
 
-  FRIEND_TEST(insert, case1);
+  FRIEND_TEST(insert, increasing_levels);
 };
 
 

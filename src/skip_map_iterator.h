@@ -78,7 +78,7 @@ class skip_map_iterator
 
  private:
   node_pointer_type node;
-  FRIEND_TEST(insert, case1);
+  FRIEND_TEST(insert, increasing_levels);
 };
 
 #endif /* skip_map_iterator_h */

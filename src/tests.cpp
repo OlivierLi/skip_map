@@ -118,26 +118,26 @@ TEST(insert, duplicates) {
   ASSERT_FALSE(sm.insert({0, ""}).second);
 }
 
-TEST(insert, case1) {
-  int increasing_key = 0;
+TEST(insert, increasing_levels) {
   skip_map<int, std::string> sm;
-
   std::vector<size_t> level_sequence{0,1,2,3};
-  //std::vector<size_t> level_sequence{1,1,0,3};
-  //std::vector<size_t> level_sequence{3,2,1,0};
 
+  int increasing_key = 0;
   for(size_t level : level_sequence){
-    sm.set_gen_for_testing([level](){return level;});
-    ASSERT_TRUE(sm.insert({++increasing_key, ""}).second);
+    ++increasing_key;
 
-    auto it = sm.find(increasing_key);
-    ASSERT_EQ(it.node->links.size(), level);
+    sm.set_gen_for_testing([level](){return level;});
+
+    bool success;
+    skip_map<int, std::string>::iterator iterator;
+    std::tie(iterator, success) = sm.insert({increasing_key, std::to_string(increasing_key)});
+
+    ASSERT_TRUE(success);
+    ASSERT_EQ(iterator.node->links.size(), level+1);
+    ASSERT_EQ(iterator->second, std::to_string(increasing_key));
   }
 
   EXPECT_EQ(sm.size(), level_sequence.size());
-  for(const auto& k_v : sm){
-    std::cout << k_v.first << ":" << k_v.second << std::endl;
-  }
 }
 
 TEST(static_case, constness) {
