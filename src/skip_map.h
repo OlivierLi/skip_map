@@ -8,8 +8,16 @@
 #include <limits>
 #include <random>
 #include <stdexcept>
+#include "distribution.hpp"
 #include "skip_map_iterator.h"
 #include "skip_map_node.h"
+
+template <typename T>
+struct compare_with_stats {
+  constexpr bool operator()(const T& lhs, const T& rhs) const {
+    return std::less<T>()(lhs, rhs);
+  }
+};
 
 /**
  * skip_map is a sorted associative container that contains key-value pairs with
@@ -19,7 +27,7 @@
  */
 template <class Key,
           class T,
-          class Compare = std::less<Key>,
+          class Compare = compare_with_stats<Key>,
           class Allocator = std::allocator<skip_map_node<Key, T>>>
 class skip_map {
  public:
@@ -60,7 +68,6 @@ class skip_map {
     for (const auto& key_value : rhs) {
       insert(key_value);
     }
-    max_level_ = rhs.max_level_;
   }
 
   /**
@@ -238,14 +245,13 @@ class skip_map {
     // Handle the case where the new node increase the max level
     if (node_level > max_level_) {
       // Add the necessary links to rend_ without touching existing ones.
-      for (size_t i = max_level_+1; i <= node_level; ++i) {
+      for (size_t i = max_level_ + 1; i <= node_level; ++i) {
         rend_->set_link(i, end_);
       }
 
       // Increase the max level
       max_level_ = node_level;
     }
-
 
     // Create new node
     auto new_node =
@@ -493,9 +499,7 @@ class skip_map {
     }
   }
 
-  void set_gen_for_testing(std::function<int()> func){
-    gen = func;
-  }
+  void set_gen_for_testing(std::function<int()> func) { gen = func; }
 
   /**
    * Private instance of the Allocator type used to allocate and initialize
@@ -526,10 +530,11 @@ class skip_map {
   /**
    * Random number generator that determins the level of an inserted node
    */
-  size_t l = 0;
-  std::function<int()> gen =
-      std::bind(std::uniform_int_distribution<>{0, MAX_SIZE - 1},
-                std::default_random_engine{});
+  Distribution dist;
+  std::function<int()> gen = [this]() {
+    auto value = dist.get_value();
+    return value;
+  };
 
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;
@@ -538,7 +543,6 @@ class skip_map {
 
   FRIEND_TEST(insert, increasing_levels);
 };
-
 
 /**
  * Checks if the contents of lhs and rhs are equal, that is, whether lhs.size()

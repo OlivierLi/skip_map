@@ -21,13 +21,13 @@ class SkipMapTest : public ::testing::Test {
       }
     }
 
-    return std::make_pair(sm, map);
+    return std::make_pair(std::move(sm), std::move(map));
   }
 
   skip_map<int, std::string> empty_skip_map;
   std::map<int, std::string> empty_map;
 
-  std::vector<std::pair<int, std::string>> mixed_data{
+  const std::vector<std::pair<int, std::string>> mixed_data{
       {5, "fraise"}, {4, "citron"}, {2, "carotte"}, {2, "carotte"},
       {1, "patate"}, {3, "lime"},   {6, "navet"},   {0, "laitue"}};
 };
@@ -94,14 +94,18 @@ TEST_F(SkipMapTest, iterate) {
   auto& sm = map_pair.first;
   auto& map = map_pair.second;
 
+  std::cout << "CREATED" << std::endl;
+
   ASSERT_EQ(sm.size(), map.size());
 
   auto sm_it = sm.cbegin();
   auto map_it = map.cbegin();
   for (; sm_it != sm.cend(); ++sm_it, ++map_it) {
+    std::cout << sm_it->first << ",";
     ASSERT_EQ(sm_it->first, map_it->first);
     ASSERT_EQ(sm_it->second, map_it->second);
   }
+  std::cout << std::endl;
 }
 
 TEST_F(SkipMapTest, insert_with_operator) {
@@ -120,20 +124,21 @@ TEST(insert, duplicates) {
 
 TEST(insert, increasing_levels) {
   skip_map<int, std::string> sm;
-  std::vector<size_t> level_sequence{0,1,2,3};
+  std::vector<size_t> level_sequence{0, 1, 2, 3};
 
   int increasing_key = 0;
-  for(size_t level : level_sequence){
+  for (size_t level : level_sequence) {
     ++increasing_key;
 
-    sm.set_gen_for_testing([level](){return level;});
+    sm.set_gen_for_testing([level]() { return level; });
 
     bool success;
     skip_map<int, std::string>::iterator iterator;
-    std::tie(iterator, success) = sm.insert({increasing_key, std::to_string(increasing_key)});
+    std::tie(iterator, success) =
+        sm.insert({increasing_key, std::to_string(increasing_key)});
 
     ASSERT_TRUE(success);
-    ASSERT_EQ(iterator.node->links.size(), level+1);
+    ASSERT_EQ(iterator.node->links.size(), level + 1);
     ASSERT_EQ(iterator->second, std::to_string(increasing_key));
   }
 
@@ -196,12 +201,19 @@ TEST_F(SkipMapTest, copying) {
 TEST_F(SkipMapTest, move_construction) {
   skip_map<int, std::string> sm1;
 
+  std::cout << "1" << std::endl;
+
   for (const auto& pair : mixed_data) {
     sm1.insert(pair);
   }
 
+  std::cout << std::endl << "2" << std::endl;
+
   // move assign into sm2
   skip_map<int, std::string> bak = sm1;
+
+  std::cout << std::endl << "3" << std::endl;
+
   skip_map<int, std::string> sm2(std::move(sm1));
   ASSERT_EQ(sm2, bak);
 }
