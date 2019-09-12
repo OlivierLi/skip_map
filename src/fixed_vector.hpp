@@ -1,5 +1,6 @@
+#pragma once
+
 #include <array>
-#include <cassert>
 
 template <typename T, size_t S>
 class fixed_vector {
@@ -25,10 +26,7 @@ class fixed_vector {
 
   auto end() const { return data.begin() + size_; }
 
-  auto& back() const {
-    assert(!data.empty());
-    return data[size_ - 1];
-  }
+  auto& back() const { return data[size_ - 1]; }
 
   template <class... Args>
   void emplace_back(Args&&... args) {
@@ -52,16 +50,10 @@ class fixed_vector {
     }
   }
 
-  void resize(size_t count) {
-    assert(count <= capacity_);
-    size_ = count;
-  }
+  void resize(size_t count) { size_ = count; }
 
   // Handle rref
-  void push_back(T value) {
-    assert(!full());
-    data[size_++] = value;
-  }
+  void push_back(T value) { data[size_++] = value; }
 
  private:
   std::array<T, S> data;

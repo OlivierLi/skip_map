@@ -2,6 +2,9 @@
 #include <map>
 #include "gtest/gtest.h"
 #include "skip_map.h"
+#include "test_facilities.hpp"
+
+using test_skip_map = skip_map<int, std::string, compare_with_stats<int>>;
 
 class SkipMapTest : public ::testing::Test {
  protected:
@@ -10,7 +13,7 @@ class SkipMapTest : public ::testing::Test {
 
   auto create_identical_maps(
       const std::vector<std::pair<int, std::string>>& data) {
-    skip_map<int, std::string> sm;
+    test_skip_map sm;
     std::map<int, std::string> map;
 
     for (auto key_value : data) {
@@ -24,7 +27,7 @@ class SkipMapTest : public ::testing::Test {
     return std::make_pair(std::move(sm), std::move(map));
   }
 
-  skip_map<int, std::string> empty_skip_map;
+  test_skip_map empty_skip_map;
   std::map<int, std::string> empty_map;
 
   const std::vector<std::pair<int, std::string>> mixed_data{
@@ -48,9 +51,8 @@ TEST_F(SkipMapTest, all_lookup_techniques_mixed_data) {
 
   // Define a vector of different techniques that can be used to extract an
   // iterator from both a skip_map and an std::map by providing the key
-  std::vector<
-      std::function<std::pair<skip_map<int, std::string>::iterator,
-                              std::map<int, std::string>::iterator>(int)>>
+  std::vector<std::function<std::pair<
+      test_skip_map::iterator, std::map<int, std::string>::iterator>(int)>>
       techniques;
 
   // Add all techniques here that have to be tested in the exact same way
@@ -94,18 +96,14 @@ TEST_F(SkipMapTest, iterate) {
   auto& sm = map_pair.first;
   auto& map = map_pair.second;
 
-  std::cout << "CREATED" << std::endl;
-
   ASSERT_EQ(sm.size(), map.size());
 
   auto sm_it = sm.cbegin();
   auto map_it = map.cbegin();
   for (; sm_it != sm.cend(); ++sm_it, ++map_it) {
-    std::cout << sm_it->first << ",";
     ASSERT_EQ(sm_it->first, map_it->first);
     ASSERT_EQ(sm_it->second, map_it->second);
   }
-  std::cout << std::endl;
 }
 
 TEST_F(SkipMapTest, insert_with_operator) {
@@ -116,14 +114,36 @@ TEST_F(SkipMapTest, insert_with_operator) {
   ASSERT_EQ(empty_skip_map[0], "Test");
 }
 
+TEST(compare_count, none) {
+  test_skip_map sm;
+  ASSERT_EQ(sm.key_comparator_.compare_count, 0);
+}
+
+TEST(compare_count, case1) {
+  test_skip_map sm;
+
+  // Set the level we will use to avoid getting additional
+  // comparisons from walking down levels.
+  sm.set_gen_for_testing([]() { return 0; });
+
+  ASSERT_TRUE(sm.insert({0, ""}).second);
+  sm.key_comparator_.compare_count = 0;
+
+  ASSERT_TRUE(sm.insert({1, ""}).second);
+
+  // One to check if the value in already there in insert().
+  // One to compare with the one value that is there in splice().
+  ASSERT_EQ(sm.key_comparator_.compare_count, 2);
+}
+
 TEST(insert, duplicates) {
-  skip_map<int, std::string> sm;
+  test_skip_map sm;
   ASSERT_TRUE(sm.insert({0, ""}).second);
   ASSERT_FALSE(sm.insert({0, ""}).second);
 }
 
 TEST(insert, increasing_levels) {
-  skip_map<int, std::string> sm;
+  test_skip_map sm;
   std::vector<size_t> level_sequence{0, 1, 2, 3};
 
   int increasing_key = 0;
@@ -133,7 +153,7 @@ TEST(insert, increasing_levels) {
     sm.set_gen_for_testing([level]() { return level; });
 
     bool success;
-    skip_map<int, std::string>::iterator iterator;
+    test_skip_map::iterator iterator;
     std::tie(iterator, success) =
         sm.insert({increasing_key, std::to_string(increasing_key)});
 
@@ -146,7 +166,7 @@ TEST(insert, increasing_levels) {
 }
 
 TEST(static_case, constness) {
-  skip_map<int, std::string> sm;
+  test_skip_map sm;
 
   static_assert(!std::is_const<decltype(sm.begin())::value_type>::value,
                 "Value type can't be const for non const iterators");
@@ -156,8 +176,8 @@ TEST(static_case, constness) {
 }
 
 TEST(operators, equal) {
-  skip_map<int, std::string> sm1;
-  skip_map<int, std::string> sm2;
+  test_skip_map sm1;
+  test_skip_map sm2;
   ASSERT_EQ(sm1, sm2);
 
   std::pair<int, std::string> key_value{1, "A"};
@@ -177,8 +197,8 @@ TEST(operators, equal) {
 }
 
 TEST_F(SkipMapTest, copying) {
-  skip_map<int, std::string> sm1;
-  skip_map<int, std::string> sm2;
+  test_skip_map sm1;
+  test_skip_map sm2;
 
   for (const auto& pair : mixed_data) {
     sm1.insert(pair);
@@ -189,7 +209,7 @@ TEST_F(SkipMapTest, copying) {
   ASSERT_EQ(sm1, sm2);
 
   // Copy construct into sm3
-  skip_map<int, std::string> sm3 = sm1;
+  test_skip_map sm3 = sm1;
   ASSERT_EQ(sm1, sm3);
 
   // Verify that we have deep copies
@@ -199,41 +219,35 @@ TEST_F(SkipMapTest, copying) {
 }
 
 TEST_F(SkipMapTest, move_construction) {
-  skip_map<int, std::string> sm1;
-
-  std::cout << "1" << std::endl;
+  test_skip_map sm1;
 
   for (const auto& pair : mixed_data) {
     sm1.insert(pair);
   }
 
-  std::cout << std::endl << "2" << std::endl;
-
   // move assign into sm2
-  skip_map<int, std::string> bak = sm1;
+  test_skip_map bak = sm1;
 
-  std::cout << std::endl << "3" << std::endl;
-
-  skip_map<int, std::string> sm2(std::move(sm1));
+  test_skip_map sm2(std::move(sm1));
   ASSERT_EQ(sm2, bak);
 }
 
 TEST_F(SkipMapTest, move_assignment) {
-  skip_map<int, std::string> sm1;
+  test_skip_map sm1;
 
   for (const auto& pair : mixed_data) {
     sm1.insert(pair);
   }
 
   // move assign into sm2
-  skip_map<int, std::string> bak = sm1;
-  skip_map<int, std::string> sm2;
+  test_skip_map bak = sm1;
+  test_skip_map sm2;
   sm2 = std::move(sm1);
   ASSERT_EQ(sm2, bak);
 }
 
 TEST_F(SkipMapTest, clear) {
-  skip_map<int, std::string> sm;
+  test_skip_map sm;
 
   for (const auto& pair : mixed_data) {
     sm.insert(pair);

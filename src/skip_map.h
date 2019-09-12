@@ -11,13 +11,7 @@
 #include "distribution.hpp"
 #include "skip_map_iterator.h"
 #include "skip_map_node.h"
-
-template <typename T>
-struct compare_with_stats {
-  constexpr bool operator()(const T& lhs, const T& rhs) const {
-    return std::less<T>()(lhs, rhs);
-  }
-};
+#include "test_facilities.hpp"
 
 /**
  * skip_map is a sorted associative container that contains key-value pairs with
@@ -64,7 +58,8 @@ class skip_map {
    * Copy constructor, performs a deep copy of the data in rhs
    */
   skip_map(const skip_map& rhs) : skip_map() {
-    // TODO : Use range insert
+    // TODO : Copy the max level and just do a regular walk and copy. Much
+    // faster.
     for (const auto& key_value : rhs) {
       insert(key_value);
     }
@@ -225,7 +220,8 @@ class skip_map {
       return;
     }
 
-    // Remove the nodes one by one until we are left with the end
+    // TODO: Would be faster to just walk and delete. No need to keep the to
+    // levels intact. Remove the nodes one by one until we are left with the end
     for (auto it = begin(); it != end(); it = erase(it))
       ;
   }
@@ -235,9 +231,12 @@ class skip_map {
    * contain an element with an equivalent key.
    */
   std::pair<iterator, bool> insert(value_type value) {
-    auto current = lower_bound(value.first);
+    splice_t splice_vec = splice(value.first);
+
+    // Just like lower_bound would do.
+    auto current = splice_vec.back() + 1;
     if (!key_comparator_(value.first, current->first) && current != end()) {
-      return std::make_pair(current, false);
+      return {current, false};
     }
 
     size_t node_level = gen();
@@ -251,18 +250,22 @@ class skip_map {
 
       // Increase the max level
       max_level_ = node_level;
+
+      // We invalidated the lower bounds created earlier. Call the same function
+      // to set them back.
+      splice_vec = splice(value.first);
     }
 
     // Create new node
     auto new_node =
         allocate_and_init(std::move(value.first), std::move(value.second));
-    const auto& splice_vec = splice(value.first);
+
     for (auto it : splice_vec) {
       new_node->set_link(it.level_, (it + 1).get());
       it.get()->set_link(it.level_, new_node);
     }
 
-    return std::make_pair(iterator(new_node), true);
+    return {iterator(new_node), true};
   }
 
   /**
@@ -456,22 +459,22 @@ class skip_map {
   const_splice_t splice(const Key& key) const {
     const_splice_t lower_bounds;
 
-    // Start at the top level and go down every level
+    // Start at the top level and go down every level to the fist non terminal
+    // node on the level.
     const_iterator start(rend_, max_level_);
     for (size_t i = 0; i <= max_level_; ++i) {
-      // Access the fist non terminal node on the level
       auto temp = start;
 
+      const_iterator it;
       // Advance as far as we can without reaching the end or going over
-      while (temp + 1 != end() && key_comparator_((temp + 1)->first, key)) {
+      while ((it = temp + 1) != end() && key_comparator_((it)->first, key)) {
         ++temp;
       }
 
-      lower_bounds.emplace_back(temp);
+      lower_bounds.push_back(temp);
 
-      // The seach will start again from the last found node
+      // The seach will start again from the last found node at the next level.
       start = temp;
-
       start.go_down();
     }
 
@@ -531,10 +534,7 @@ class skip_map {
    * Random number generator that determins the level of an inserted node
    */
   Distribution dist;
-  std::function<int()> gen = [this]() {
-    auto value = dist.get_value();
-    return value;
-  };
+  std::function<int()> gen = [this]() { return dist.get_value(); };
 
   // Define friend classes only for unit testing purposes
   friend class ConstructedTest;
@@ -542,6 +542,9 @@ class skip_map {
   FRIEND_TEST(ConstructedTest, splice);
 
   FRIEND_TEST(insert, increasing_levels);
+
+  FRIEND_TEST(compare_count, none);
+  FRIEND_TEST(compare_count, case1);
 };
 
 /**

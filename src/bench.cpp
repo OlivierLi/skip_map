@@ -28,7 +28,28 @@ static void BM_MapCreation(benchmark::State& state) {
   }
 }
 
+static void BM_FixedVectorCreation(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    fixed_vector<int, 1000> f;
+    for (int i = 0; i < 1000; ++i) {
+      f.push_back(i);
+    }
+  }
+}
+
+static void BM_VectorCreation(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    std::vector<int> v;
+    for (int i = 0; i < 1000; ++i) {
+      v.push_back(i);
+    }
+  }
+}
+
 BENCHMARK(BM_SkipMapCreation);
 BENCHMARK(BM_MapCreation);
+
+BENCHMARK(BM_FixedVectorCreation);
+BENCHMARK(BM_VectorCreation);
 
 BENCHMARK_MAIN();
