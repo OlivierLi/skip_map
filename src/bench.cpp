@@ -1,4 +1,5 @@
 #include <iostream>
+#include <list>
 #include "benchmark/benchmark.h"
 #include "skip_map.h"
 
@@ -7,32 +8,41 @@
 // TODO : Count allocations of objects through ctor calls
 // TODO : Different test using map of 10000 element already created
 
+constexpr const char* long_string{"This is a very long long long string"};
+constexpr int default_size{1000};
+constexpr int MAX_LEVEL = 4;
+
+using Key = int;
+using Value = const char*;
+using KeyValue = std::pair<Key, Value>;
+
 template <typename C>
 void fill(C& container) {
-  for (size_t i = 0; i < 1000; ++i) {
-    container.insert({i, "This is a very long long long string"});
+  for (size_t i = 0; i < default_size; ++i) {
+    container.insert({i, long_string});
   }
 }
 
 static void BM_SkipMapCreation(benchmark::State& state) {
   while (state.KeepRunning()) {
-    skip_map<int, const char*> sm;
+    skip_map<Key, Value> sm;
     fill(sm);
   }
 }
 
 static void BM_MapCreation(benchmark::State& state) {
   while (state.KeepRunning()) {
-    std::map<int, const char*> m;
+    std::map<Key, Value> m;
     fill(m);
   }
 }
 
 static void BM_FixedVectorCreation(benchmark::State& state) {
   while (state.KeepRunning()) {
-    fixed_vector<int, 1000> f;
-    for (int i = 0; i < 1000; ++i) {
+    fixed_vector<int, MAX_LEVEL> f;
+    for (int i = 0; i < MAX_LEVEL; ++i) {
       f.push_back(i);
+      benchmark::DoNotOptimize(f.at(i));
     }
   }
 }
@@ -40,9 +50,40 @@ static void BM_FixedVectorCreation(benchmark::State& state) {
 static void BM_VectorCreation(benchmark::State& state) {
   while (state.KeepRunning()) {
     std::vector<int> v;
-    for (int i = 0; i < 1000; ++i) {
+    for (int i = 0; i < MAX_LEVEL; ++i) {
       v.push_back(i);
+      benchmark::DoNotOptimize(v.at(i));
     }
+  }
+}
+
+class MyFixture : public benchmark::Fixture {
+ public:
+  void SetUp(const ::benchmark::State& /*state*/) {
+    // Fill a skip_map making sure that it looks like a linked-list as much as
+    // possible.
+    sm.set_gen_for_testing([]() { return 0; });
+    fill(sm);
+
+    // Fill an equivalent linked-list.
+    l = std::list<KeyValue>(default_size, {1, long_string});
+  }
+
+  skip_map<Key, Value> sm;
+  std::list<KeyValue> l;
+};
+
+BENCHMARK_F(MyFixture, BM_ListIterate)(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    for (auto it = l.cbegin(); it != l.cend(); ++it)
+      ;
+  }
+}
+
+BENCHMARK_F(MyFixture, BM_SkipMapIterate)(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    for (auto it = sm.cbegin(); it != sm.cend(); ++it)
+      ;
   }
 }
 

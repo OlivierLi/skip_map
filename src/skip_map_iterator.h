@@ -29,11 +29,14 @@ class skip_map_iterator
 
   skip_map_iterator& operator++() {
     // Do not iterate into nullptr
-    if (node->link_at(level_)) {
-      node = node->link_at(level_);
+    auto* next = node->link_at(level_);
+    if (next) {
+      node = next;
     }
+
     return *this;
   }
+
   skip_map_iterator operator++(int) {
     skip_map_iterator tmp(*this);
     operator++();

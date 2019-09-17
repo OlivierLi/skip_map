@@ -28,16 +28,9 @@ class skip_map_node {
 
   /**
    * Accessor to get the link pointer at the desired index.
-   * Accessing levels out of range result in nullptr
    * @param[in] i The index of the link.
    */
-  skip_map_node* link_at(size_t i) const {
-    if (links.empty() || i > links.size() - 1) {
-      return nullptr;
-    }
-
-    return links.at(i);
-  }
+  skip_map_node* link_at(size_t i) const { return links[i]; }
 
   /**
    * Accessor to set the link pointer at the desired index.
@@ -56,6 +49,13 @@ class skip_map_node {
    * The value contained within the node.
    */
   std::pair<const Key, T> entry;
+
+  /**
+   * Fill levels to nullptr.
+   */
+  void initialize_to_null() {
+    links = std::vector<skip_map_node*>(MAX_SIZE, nullptr);
+  }
 
  private:
   /**

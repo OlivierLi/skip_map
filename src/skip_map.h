@@ -51,6 +51,10 @@ class skip_map {
    */
   skip_map()
       : rend_(allocate_and_init()), end_(allocate_and_init()), max_level_(0) {
+    // Fill terminal nodes with nulls as the will never be filled organically.
+    end_->initialize_to_null();
+    rend_->initialize_to_null();
+
     rend_->set_link(0, end_);
   }
 
@@ -435,6 +439,8 @@ class skip_map {
    */
   Allocator get_allocator() const { return allocator_; }
 
+  void set_gen_for_testing(std::function<int()> func) { gen = func; }
+
  private:
   /**
    * Return lower bound of each level by key.
@@ -501,8 +507,6 @@ class skip_map {
       allocator_.deallocate(ptr, sizeof(node_type));
     }
   }
-
-  void set_gen_for_testing(std::function<int()> func) { gen = func; }
 
   /**
    * Private instance of the Allocator type used to allocate and initialize
