@@ -6,6 +6,8 @@
 #include "skip_map.h"
 #include "test_facilities.hpp"
 
+size_t large_size = 10000;
+
 void iterate(skip_map<Key, Value>& sm) {
   for (auto it = sm.begin(); it != sm.end(); ++it)
     ;
@@ -13,12 +15,12 @@ void iterate(skip_map<Key, Value>& sm) {
 
 int main(int, char**) {
   // Create a list.
-  std::list<KeyValue> list(default_size, {1, long_string});
+  std::list<KeyValue> list(large_size, {1, long_string});
 
   // Create an equivalent skip_map.
   skip_map<Key, Value> sm;
   sm.set_gen_for_testing([]() { return 0; });
-  fill(sm);
+  fill(sm, large_size);
 
   for (auto it = sm.begin(); it != sm.end(); ++it)
     ;

@@ -21,8 +21,8 @@ struct compare_with_stats {
 
 // Fil a container with increasingly large keys and the same value.
 template <typename C>
-void fill(C& container) {
-  for (size_t i = 0; i < default_size; ++i) {
+void fill(C& container, size_t size=default_size) {
+  for (size_t i = 0; i < size; ++i) {
     container.insert({i, long_string});
   }
 }
