@@ -2,26 +2,12 @@
 #include <list>
 #include "benchmark/benchmark.h"
 #include "skip_map.h"
+#include "test_facilities.hpp"
 
 // TODO : Print structure to visualize problems, each level seems to be doing a
 // linear search this is like if all the level were full linked lists
 // TODO : Count allocations of objects through ctor calls
 // TODO : Different test using map of 10000 element already created
-
-constexpr const char* long_string{"This is a very long long long string"};
-constexpr int default_size{1000};
-constexpr int MAX_LEVEL = 4;
-
-using Key = int;
-using Value = const char*;
-using KeyValue = std::pair<Key, Value>;
-
-template <typename C>
-void fill(C& container) {
-  for (size_t i = 0; i < default_size; ++i) {
-    container.insert({i, long_string});
-  }
-}
 
 static void BM_SkipMapCreation(benchmark::State& state) {
   while (state.KeepRunning()) {
